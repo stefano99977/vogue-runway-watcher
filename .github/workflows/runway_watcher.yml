@@ -1,1 +1,77 @@
+name: Vogue Runway Watcher
+
+on:
+  schedule:
+    # Daily at 07:00 UTC (~08:00 Madrid in winter; ~09:00 Madrid in summer)
+    - cron: "0 7 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Detect new seasons
+        id: detect
+        run: |
+          set +e
+          python scripts/watch_seasons.py
+          code=$?
+          echo "exit_code=$code" >> $GITHUB_OUTPUT
+          exit 0
+
+      - name: Process new seasons (scrape → build gallery → build index)
+        if: steps.detect.outputs.exit_code == '1'
+        run: |
+          python - << 'PY'
+          import json, sys, subprocess
+          from pathlib import Path
+
+          new_file = Path("data/new_seasons.json")
+          if not new_file.exists():
+              raise SystemExit("Expected data/new_seasons.json but file not found.")
+
+          new = json.loads(new_file.read_text(encoding="utf-8")).get("new_seasons", [])
+          if not new:
+              print("No new seasons listed; nothing to do.")
+              raise SystemExit(0)
+
+          for season in new:
+              # 1) scrape season → CSV
+              subprocess.check_call([sys.executable, "scripts/scrape_season.py", season])
+
+              # 2) build gallery → HTML
+              csv_path = f"data/seasons/{season}.csv"
+              html_path = f"site/seasons/{season}.html"
+              title = f"Vogue {season.replace('-', ' ').title()} — Image Gallery"
+              subprocess.check_call([sys.executable, "scripts/build_gallery.py", csv_path, html_path, title])
+
+          # 3) rebuild site index
+          subprocess.check_call([sys.executable, "scripts/build_index.py"])
+          PY
+
+      - name: Commit and push changes
+        if: steps.detect.outputs.exit_code == '1'
+        run: |
+          git config user.name "runway-bot"
+          git config user.email "runway-bot@users.noreply.github.com"
+          git add data/ site/
+          git commit -m "New Vogue seasons detected + galleries built" || exit 0
+          git push
 
