@@ -61,8 +61,17 @@ def main() -> int:
     current_slugs = extract_season_slugs(html)
 
     state = load_state()
-    known = set(state.get("known_season_slugs", []))
+    known_list = state.get("known_season_slugs", [])
 
+    # ✅ BOOTSTRAP MODE:
+    # If there's no prior state, we store it and exit without scraping.
+    if not known_list:
+        print(f"🧱 Bootstrap: saving {len(current_slugs)} season slugs as baseline (no scraping).")
+        state["known_season_slugs"] = current_slugs
+        save_state(state)
+        return 0
+
+    known = set(known_list)
     new_slugs = [s for s in current_slugs if s not in known]
 
     if not new_slugs:
@@ -80,7 +89,8 @@ def main() -> int:
         encoding="utf-8",
     )
 
-    return 1  # signal to GitHub Actions that something changed
+    return 1
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
