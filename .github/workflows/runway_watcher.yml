@@ -58,7 +58,7 @@ jobs:
 
               # 2) build gallery → HTML
               csv_path = f"data/seasons/{season}.csv"
-              html_path = f"site/seasons/{season}.html"
+              html_path = f"docs/seasons/{season}.html"
               title = f"Vogue {season.replace('-', ' ').title()} — Image Gallery"
               subprocess.check_call([sys.executable, "scripts/build_gallery.py", csv_path, html_path, title])
 
