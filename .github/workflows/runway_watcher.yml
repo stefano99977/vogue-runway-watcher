@@ -67,7 +67,7 @@ jobs:
           PY
 
       - name: Commit and push changes
-        if: steps.detect.outputs.exit_code == '1'
+        if: steps.detect.outputs.exit_code != '2'
         run: |
           git config user.name "runway-bot"
           git config user.email "runway-bot@users.noreply.github.com"
