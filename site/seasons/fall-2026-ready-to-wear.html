@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vogue Fall 2026 Ready To Wear — Image Gallery</title>
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --panel: #111318;
+      --text: #e8eaf0;
+      --muted: #a8afc2;
+      --border: rgba(255,255,255,0.10);
+      --border2: rgba(255,255,255,0.16);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+      --accent: #6ea8fe;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1200px 900px at 20% -10%, rgba(110,168,254,.25), transparent 60%),
+                  radial-gradient(1000px 800px at 120% 10%, rgba(167,139,250,.18), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+    }
+    .app { max-width: 1400px; margin: 0 auto; padding: 22px 18px 40px; }
+    header { display:flex; gap:14px; align-items:flex-end; justify-content:space-between; margin-bottom:14px; }
+    h1 { font-size:22px; margin:0; font-weight:700; }
+    .subtitle { color:var(--muted); font-size:13px; line-height:1.3; }
+    .kpis { display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+    .pill { background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--muted);
+      border-radius: 999px; padding: 8px 10px; font-size: 12px; display: inline-flex; gap: 8px; align-items: center; white-space: nowrap; }
+    .pill strong { color: var(--text); font-weight: 650; }
+    .controls {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(11,12,16,.92), rgba(11,12,16,.72));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px; box-shadow: var(--shadow); margin-bottom: 16px;
+    }
+    .controls-grid { display:grid; grid-template-columns: 1.4fr 0.8fr 0.8fr 0.7fr auto auto; gap:10px; align-items:center; }
+    @media (max-width: 980px) { .controls-grid { grid-template-columns: 1fr 1fr; } header { flex-direction: column; align-items: flex-start; } .kpis { justify-content:flex-start; } }
+    .field { display:grid; gap:6px; }
+    label { font-size: 12px; color: var(--muted); }
+    input[type="search"], select {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+    input[type="search"]::placeholder { color: rgba(232,234,240,.55); }
+    .btn {
+      border: 1px solid var(--border2);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .btn.primary { background: linear-gradient(135deg, rgba(110,168,254,.25), rgba(167,139,250,.20)); border-color: rgba(110,168,254,.35); }
+    .toggles { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .toggle { display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border-radius:999px; border:1px solid var(--border);
+      background: rgba(255,255,255,0.05); color: var(--muted); font-size: 12px; user-select: none; }
+    .toggle input { accent-color: var(--accent); }
+    .layout { border-radius: var(--radius); padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
+    .masonry { column-count: 5; column-gap: 12px; }
+    @media (max-width: 1300px) { .masonry { column-count: 4; } }
+    @media (max-width: 980px)  { .masonry { column-count: 3; } }
+    @media (max-width: 640px)  { .masonry { column-count: 2; } }
+    @media (max-width: 420px)  { .masonry { column-count: 1; } }
+    .card { break-inside: avoid; margin: 0 0 12px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03); box-shadow: 0 8px 22px rgba(0,0,0,.28); position: relative; cursor: pointer; }
+    .thumb { width: 100%; display: block; background: rgba(255,255,255,0.05); min-height: 180px; object-fit: cover; }
+    .meta { padding: 10px 10px 12px; display: grid; gap: 4px; }
+    .meta .top { display:flex; gap:8px; align-items:baseline; justify-content:space-between; }
+    .designer { font-size: 13px; font-weight: 650; letter-spacing: .1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .look { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .caption { color: rgba(232,234,240,.84); font-size: 12px; line-height: 1.25; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .badge { position:absolute; left:10px; top:10px; border-radius:999px; padding:6px 9px; font-size:11px; background: rgba(0,0,0,.40);
+      border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: rgba(255,255,255,.90); }
+    .actions { position:absolute; right:10px; top:10px; display:flex; gap:8px; }
+    .iconbtn { width:32px; height:32px; border-radius:999px; border:1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,.40);
+      color: rgba(255,255,255,.90); display:grid; place-items:center; cursor:pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); user-select:none; }
+    .iconbtn[data-starred="true"] { border-color: rgba(110,168,254,.55); background: rgba(110,168,254,.18); }
+    .footerbar { display:grid; place-items:center; padding: 18px 0 0; color: var(--muted); font-size: 12px; gap: 8px; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.72); display:none; align-items:center; justify-content:center; padding:22px; z-index: 100; }
+    .modal.open { display:flex; }
+    .modal-card { width: min(1100px, 96vw); max-height: 92vh; background: rgba(17,19,24,.92); border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); display:grid; grid-template-columns: 1.7fr 1fr; }
+    @media (max-width: 980px) { .modal-card { grid-template-columns: 1fr; } }
+    .modal-imgwrap { background: rgba(0,0,0,.28); display:grid; place-items:center; min-height: 320px; }
+    .modal-img { width: 100%; height: 100%; max-height: 92vh; object-fit: contain; display:block; }
+    .modal-side { padding: 14px; display:grid; gap:10px; align-content:start; border-left: 1px solid rgba(255,255,255,0.10); }
+    @media (max-width: 980px) { .modal-side { border-left:none; border-top: 1px solid rgba(255,255,255,0.10); } }
+    .modal-close { position:absolute; right:18px; top:18px; width:40px; height:40px; border-radius:999px; border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(17,19,24,.65); color: rgba(255,255,255,.92); display:grid; place-items:center; cursor:pointer; user-select:none; }
+    .hint { color: var(--muted); font-size: 12px; }
+    .kbd { border: 1px solid rgba(255,255,255,0.18); border-bottom-color: rgba(255,255,255,0.26); background: rgba(255,255,255,0.06);
+      border-radius: 8px; padding: 2px 6px; font-size: 11px; color: rgba(232,234,240,.85); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Vogue Fall 2026 Ready To Wear — Image Gallery</h1>
+        <div class="subtitle">
+          Generated: <strong>2026-01-31 09:11 UTC</strong> — source: <code>fall-2026-ready-to-wear.csv</code>
+        </div>
+      </div>
+      <div class="kpis">
+        <div class="pill"><strong id="kpiTotal">0</strong> total</div>
+        <div class="pill"><strong id="kpiFiltered">0</strong> showing</div>
+        <div class="pill"><strong id="kpiDesigners">0</strong> designers</div>
+      </div>
+    </header>
+
+    <section class="controls">
+      <div class="controls-grid">
+        <div class="field">
+          <label for="q">Search</label>
+          <input id="q" type="search" placeholder="Designer, caption, look number…" autocomplete="off" />
+        </div>
+
+        <div class="field">
+          <label for="season">Season</label>
+          <select id="season"></select>
+        </div>
+
+        <div class="field">
+          <label for="designer">Designer</label>
+          <select id="designer"></select>
+        </div>
+
+        <div class="field">
+          <label for="sort">Sort</label>
+          <select id="sort">
+            <option value="designer_look">Designer, Look</option>
+            <option value="look">Look (ascending)</option>
+            <option value="designer">Designer (A–Z)</option>
+            <option value="random">Random</option>
+          </select>
+        </div>
+
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="export">Export filtered CSV</button>
+
+        <div class="toggles" style="grid-column: 1 / -1;">
+          <label class="toggle" title="Show only starred">
+            <input id="onlyStarred" type="checkbox" />
+            Only starred
+          </label>
+          <label class="toggle" title="Auto-load more while scrolling">
+            <input id="autoLoad" type="checkbox" checked />
+            Auto-load
+          </label>
+          <div class="hint">Keys: <span class="kbd">Esc</span> close • <span class="kbd">←</span>/<span class="kbd">→</span> navigate</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div id="grid" class="masonry"></div>
+      <div class="footerbar">
+        <div id="status" class="hint"></div>
+        <button class="btn" id="loadMore">Load more</button>
+        <div id="sentinel" style="position:absolute;width:1px;height:1px;opacity:0;"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="modal-close" id="modalClose" title="Close (Esc)">✕</div>
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <div class="modal-imgwrap">
+        <img id="modalImg" class="modal-img" alt="" />
+      </div>
+      <div class="modal-side">
+        <div>
+          <div style="font-size:16px;font-weight:720" id="modalDesigner"></div>
+          <div style="font-size:12px;color:var(--muted)" id="modalMeta"></div>
+        </div>
+        <div style="font-size:13px;line-height:1.35;color:rgba(232,234,240,.88)" id="modalCaption"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn" id="openSource" target="_blank" rel="noopener">Open source</a>
+          <a class="btn" id="openImage" target="_blank" rel="noopener">Open image</a>
+          <button class="btn" id="toggleStar">Star</button>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:space-between;align-items:center">
+          <button class="btn" id="prev">← Prev</button>
+          <div class="hint"><span id="modalIndex">0</span> / <span id="modalCount">0</span></div>
+          <button class="btn" id="next">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const DATA = [{"season": "fall-2026-ready-to-wear", "designer": "Christophe Lemaire", "look_number": 1, "image_url": "https://assets.vogue.com/photos/697159ad851ab91d8e19a852/master/w_2560%2Cc_limit/00001-lemaire-fall-2026-ready-to-wear-credit-jack-day-brand.jpg", "caption": "Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/christophe-lemaire"}, {"season": "fall-2026-ready-to-wear", "designer": "Christophe Lemaire", "look_number": 2, "image_url": "https://assets.vogue.com/photos/697159ac37fde79a855972d1/master/w_2560%2Cc_limit/00002-lemaire-fall-2026-ready-to-wear-credit-jack-day-brand.jpg", "caption": "Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/christophe-lemaire"}, {"season": "fall-2026-ready-to-wear", "designer": "Christophe Lemaire", "look_number": 3, "image_url": "https://assets.vogue.com/photos/697159ad9a39edf146901922/master/w_2560%2Cc_limit/00003-lemaire-fall-2026-ready-to-wear-credit-jack-day-brand.jpg", "caption": "Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/christophe-lemaire"}, {"season": "fall-2026-ready-to-wear", "designer": "Christophe Lemaire", "look_number": 4, "image_url": "https://assets.vogue.com/photos/697159b1c54dadec65ea300f/master/w_2560%2Cc_limit/00004-lemaire-fall-2026-ready-to-wear-credit-jack-day-brand.jpg", "caption": "Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/christophe-lemaire"}, {"season": "fall-2026-ready-to-wear", "designer": "Christophe Lemaire", "look_number": 5, "image_url": "https://assets.vogue.com/photos/697159b30f7c7191334c1c84/master/w_2560%2Cc_limit/00005-lemaire-fall-2026-ready-to-wear-credit-jack-day-brand.jpg", "caption": "Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/christophe-lemaire"}, {"season": "fall-2026-ready-to-wear", "designer": "Christophe Lemaire", "look_number": 6, "image_url": "https://assets.vogue.com/photos/697159b3e9590f76a0bb8467/master/w_2560%2Cc_limit/00006-lemaire-fall-2026-ready-to-wear-credit-jack-day-brand.jpg", "caption": "Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/christophe-lemaire"}, {"season": "fall-2026-ready-to-wear", "designer": "Christophe Lemaire", "look_number": 7, "image_url": "https://assets.vogue.com/photos/6971591a602b17172dc555be/master/w_1280%2Cc_limit/00001-lemaire-fall-2026-menswear-credit-jack-day-brand.jpg", "caption": "Fall 2026 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/christophe-lemaire"}, {"season": "fall-2026-ready-to-wear", "designer": "Christophe Lemaire", "look_number": 8, "image_url": "https://assets.vogue.com/photos/69715a4ab829f41be4d3a977/master/w_1280%2Cc_limit/00008-lemaire-fall-2026-ready-to-wear-credit-jack-day-brand.jpg", "caption": "Fall 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/christophe-lemaire"}, {"season": "fall-2026-ready-to-wear", "designer": "Christophe Lemaire", "look_number": 9, "image_url": "https://assets.vogue.com/photos/685c493208cc020e174b1132/master/w_1280%2Cc_limit/00001-lemaire-spring-2026-ready-to-wear-credit-gregoire-avenel.jpg", "caption": "Spring 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/christophe-lemaire"}, {"season": "fall-2026-ready-to-wear", "designer": "Christophe Lemaire", "look_number": 10, "image_url": "https://assets.vogue.com/photos/685c481528f9ab01701016f1/master/w_1280%2Cc_limit/00004-lemaire-spring-2026-menswear-credit-gregoire-avenel.jpg", "caption": "Spring 2026 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/christophe-lemaire"}, {"season": "fall-2026-ready-to-wear", "designer": "Christophe Lemaire", "look_number": 11, "image_url": "https://assets.vogue.com/photos/67914837b470f450877cbf9e/master/w_1280%2Cc_limit/00001-lemaire-fall-2025-ready-to-wear-credit-gregoire-avenel-brand.jpg", "caption": "Fall 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/christophe-lemaire"}, {"season": "fall-2026-ready-to-wear", "designer": "Christophe Lemaire", "look_number": 12, "image_url": "https://assets.vogue.com/photos/67914716dd99aeb9fb0ee7c0/master/w_1280%2Cc_limit/00003-lemaire-fall-2025-menswear-credit-gregoire-avenel-brand.jpg", "caption": "Fall 2025 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/christophe-lemaire"}, {"season": "fall-2026-ready-to-wear", "designer": "Dsquared", "look_number": 1, "image_url": "https://assets.vogue.com/photos/696ac32309c4c0fa260b489a/master/w_2560%2Cc_limit/00001-dsquared2-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/dsquared"}, {"season": "fall-2026-ready-to-wear", "designer": "Dsquared", "look_number": 2, "image_url": "https://assets.vogue.com/photos/696ac3232df956c241887bd5/master/w_2560%2Cc_limit/00002-dsquared2-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/dsquared"}, {"season": "fall-2026-ready-to-wear", "designer": "Dsquared", "look_number": 3, "image_url": "https://assets.vogue.com/photos/696ac324ac00f90214913f16/master/w_2560%2Cc_limit/00003-dsquared2-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/dsquared"}, {"season": "fall-2026-ready-to-wear", "designer": "Dsquared", "look_number": 4, "image_url": "https://assets.vogue.com/photos/696ac328f89ea477c699a55e/master/w_2560%2Cc_limit/00004-dsquared2-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/dsquared"}, {"season": "fall-2026-ready-to-wear", "designer": "Dsquared", "look_number": 5, "image_url": "https://assets.vogue.com/photos/696ac3276e11eefb533cfc50/master/w_2560%2Cc_limit/00005-dsquared2-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/dsquared"}, {"season": "fall-2026-ready-to-wear", "designer": "Dsquared", "look_number": 6, "image_url": "https://assets.vogue.com/photos/696ac3278d18b1aac4ebfffd/master/w_2560%2Cc_limit/00006-dsquared2-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/dsquared"}, {"season": "fall-2026-ready-to-wear", "designer": "Dsquared", "look_number": 7, "image_url": "https://assets.vogue.com/photos/696ac411d7015d8e63d48d97/master/w_1280%2Cc_limit/00004-dsquared2-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Fall 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/dsquared"}, {"season": "fall-2026-ready-to-wear", "designer": "Dsquared", "look_number": 8, "image_url": "https://assets.vogue.com/photos/696ac28438670b592d7fdef6/master/w_1280%2Cc_limit/00001-dsquared2-fall-2026-menswear-credit-gorunway.jpg", "caption": "Fall 2026 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/dsquared"}, {"season": "fall-2026-ready-to-wear", "designer": "Dsquared", "look_number": 9, "image_url": "https://assets.vogue.com/photos/691ef27b72aa417914887091/master/w_1280%2Cc_limit/00001-dsquared2-pre-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Pre-Fall 2026", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/dsquared"}, {"season": "fall-2026-ready-to-wear", "designer": "Dsquared", "look_number": 10, "image_url": "https://assets.vogue.com/photos/691ef34e681be622f421a59a/master/w_1280%2Cc_limit/00001-dsquared2-pre-fall-2026-menswear-credit-brand.jpg", "caption": "Pre-Fall 2026 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/dsquared"}, {"season": "fall-2026-ready-to-wear", "designer": "Dsquared", "look_number": 11, "image_url": "https://assets.vogue.com/photos/6863b7deb8bb38708c2417d2/master/w_1280%2Cc_limit/00001-dsquared2-spring-2026-ready-to-wear-credit-brand.jpg", "caption": "Spring 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/dsquared"}, {"season": "fall-2026-ready-to-wear", "designer": "Dsquared", "look_number": 12, "image_url": "https://assets.vogue.com/photos/6863bb1fa6b59bf842e28cd2/master/w_1280%2Cc_limit/00001-dsquared2-spring-2026-menswear-credit-brand.jpg", "caption": "Spring 2026 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/dsquared"}, {"season": "fall-2026-ready-to-wear", "designer": "For Restless Sleepers", "look_number": 1, "image_url": "https://assets.vogue.com/photos/696923018a152605d31aca0c/master/w_2560%2Cc_limit/00001-for-restless-sleepers-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/for-restless-sleepers"}, {"season": "fall-2026-ready-to-wear", "designer": "For Restless Sleepers", "look_number": 2, "image_url": "https://assets.vogue.com/photos/69692302b19f92f8aaa79083/master/w_2560%2Cc_limit/00002-for-restless-sleepers-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/for-restless-sleepers"}, {"season": "fall-2026-ready-to-wear", "designer": "For Restless Sleepers", "look_number": 3, "image_url": "https://assets.vogue.com/photos/696923008a152605d31aca0a/master/w_2560%2Cc_limit/00003-for-restless-sleepers-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/for-restless-sleepers"}, {"season": "fall-2026-ready-to-wear", "designer": "For Restless Sleepers", "look_number": 4, "image_url": "https://assets.vogue.com/photos/69692305585f0072b75ade4f/master/w_2560%2Cc_limit/00004-for-restless-sleepers-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/for-restless-sleepers"}, {"season": "fall-2026-ready-to-wear", "designer": "For Restless Sleepers", "look_number": 5, "image_url": "https://assets.vogue.com/photos/69692306c2fa58c6e75d9858/master/w_2560%2Cc_limit/00005-for-restless-sleepers-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/for-restless-sleepers"}, {"season": "fall-2026-ready-to-wear", "designer": "For Restless Sleepers", "look_number": 6, "image_url": "https://assets.vogue.com/photos/6969230814fc1065806138b2/master/w_2560%2Cc_limit/00006-for-restless-sleepers-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/for-restless-sleepers"}, {"season": "fall-2026-ready-to-wear", "designer": "For Restless Sleepers", "look_number": 7, "image_url": "https://assets.vogue.com/photos/69692387f9fb2d9c3459ec2b/master/w_1280%2Cc_limit/00001-for-restless-sleepers-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Fall 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/for-restless-sleepers"}, {"season": "fall-2026-ready-to-wear", "designer": "For Restless Sleepers", "look_number": 8, "image_url": "https://assets.vogue.com/photos/68594b455e3f79222a545e27/master/w_1280%2Cc_limit/00001-for-restless-sleepers-resort-2026-credit-brand.jpg", "caption": "Resort 2026", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/for-restless-sleepers"}, {"season": "fall-2026-ready-to-wear", "designer": "For Restless Sleepers", "look_number": 9, "image_url": "https://assets.vogue.com/photos/678faa03953002f05cd2ef55/master/w_1280%2Cc_limit/00001-for-restless-sleepers-fall-2025-ready-to-wear-credit-brand.jpg", "caption": "Fall 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/for-restless-sleepers"}, {"season": "fall-2026-ready-to-wear", "designer": "For Restless Sleepers", "look_number": 10, "image_url": "https://assets.vogue.com/photos/66ed3544279dd0dd95e59aad/master/w_1280%2Cc_limit/00001-for-restless-sleepers-spring-2025-ready-to-wear-credit-brand.jpg", "caption": "Spring 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/for-restless-sleepers"}, {"season": "fall-2026-ready-to-wear", "designer": "For Restless Sleepers", "look_number": 11, "image_url": "https://assets.vogue.com/photos/666af25bb91a28e047ecf0fb/master/w_1280%2Cc_limit/00001-for-restless-sleepers-resort-2025-credit-brand.jpg", "caption": "Resort 2025", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/for-restless-sleepers"}, {"season": "fall-2026-ready-to-wear", "designer": "For Restless Sleepers", "look_number": 12, "image_url": "https://assets.vogue.com/photos/65a96218b3b4883c45262334/master/w_1280%2Cc_limit/00001-for-restless-sleepers-fall-2024-ready-to-wear-credit-brand.jpg", "caption": "Fall 2024 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/for-restless-sleepers"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 1, "image_url": "https://assets.vogue.com/photos/69679f3a31d91bb8e77a4231/master/w_2560%2Cc_limit/00001-jw-anderson-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 2, "image_url": "https://assets.vogue.com/photos/69679f3bf3db5bc410a36e7b/master/w_2560%2Cc_limit/00003-jw-anderson-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 3, "image_url": "https://assets.vogue.com/photos/69679f39331b3676fb8d336e/master/w_2560%2Cc_limit/00005-jw-anderson-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 4, "image_url": "https://assets.vogue.com/photos/69679f3eaafa95d4abed9cef/master/w_2560%2Cc_limit/00006-jw-anderson-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 5, "image_url": "https://assets.vogue.com/photos/69679f3f19476fbacb49cac9/master/w_2560%2Cc_limit/00008-jw-anderson-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 6, "image_url": "https://assets.vogue.com/photos/69679f3f19476fbacb49cacb/master/w_2560%2Cc_limit/00010-jw-anderson-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 7, "image_url": "https://assets.vogue.com/photos/6968d88ca2b01ce29bf555a4/master/w_2560%2Cc_limit/00002-jw-anderson-fall-2026-ready-to-wear-details-credit-brand.jpg", "caption": "Detail Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 8, "image_url": "https://assets.vogue.com/photos/6968d88b1bded08bfc84b188/master/w_2560%2Cc_limit/00004-jw-anderson-fall-2026-ready-to-wear-details-credit-brand.jpg", "caption": "Detail Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 9, "image_url": "https://assets.vogue.com/photos/6968d890e88b0e0542cbcc64/master/w_2560%2Cc_limit/00007-jw-anderson-fall-2026-ready-to-wear-details-credit-brand.jpg", "caption": "Detail Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 10, "image_url": "https://assets.vogue.com/photos/6968d88f8e974b675eda0689/master/w_2560%2Cc_limit/00009-jw-anderson-fall-2026-ready-to-wear-details-credit-brand.jpg", "caption": "Detail Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 11, "image_url": "https://assets.vogue.com/photos/6968d88f8a152605d31ac9e4/master/w_2560%2Cc_limit/00012-jw-anderson-fall-2026-ready-to-wear-details-credit-brand.jpg", "caption": "Detail Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 12, "image_url": "https://assets.vogue.com/photos/6968d899c85eb0bc0a9d8086/master/w_2560%2Cc_limit/00013-jw-anderson-fall-2026-ready-to-wear-details-credit-brand.jpg", "caption": "Detail Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 13, "image_url": "https://assets.vogue.com/photos/6967a41607f084577e35aedc/master/w_1280%2Cc_limit/00001-jw-anderson-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Fall 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 14, "image_url": "https://assets.vogue.com/photos/686aaa6f0cf93e16311243c2/master/w_1280%2Cc_limit/00001-jw-anderson-resort-2026-credit-brand.jpg", "caption": "Resort 2026", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 15, "image_url": "https://assets.vogue.com/photos/66e6d1a2dd1d7711dbd31a07/master/w_1280%2Cc_limit/00001-jw-anderson-spring-2025-ready-to-wear-credit-gorunway.jpg", "caption": "Spring 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 16, "image_url": "https://assets.vogue.com/photos/666f3c0777fe24f4753d29f7/master/w_1280%2Cc_limit/00001-j-w-anderson-spring-2025-menswear-credit-gorunway.jpg", "caption": "Spring 2025 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 17, "image_url": "https://assets.vogue.com/photos/65d206cd1d416ba55a96a271/master/w_1280%2Cc_limit/00001-j-w-anderson-fall-2024-ready-to-wear-credit-gorunway.jpg", "caption": "Fall 2024 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "J W Anderson", "look_number": 18, "image_url": "https://assets.vogue.com/photos/65a449e2dd6bcb5672d1d164/master/w_1280%2Cc_limit/00001-jw-anderson-fall-2024-menswear-credit-gorunway.jpg", "caption": "Fall 2024 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/j-w-anderson"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 1, "image_url": "https://assets.vogue.com/photos/69769909bde8fe02c91451f5/master/w_2560%2Cc_limit/00001-jacquemus-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 2, "image_url": "https://assets.vogue.com/photos/6976990ae2f24a7266c8647b/master/w_2560%2Cc_limit/00002-jacquemus-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 3, "image_url": "https://assets.vogue.com/photos/6976990aa917d14c5403d52c/master/w_2560%2Cc_limit/00003-jacquemus-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 4, "image_url": "https://assets.vogue.com/photos/6976990cd076a99a47387dbc/master/w_2560%2Cc_limit/00004-jacquemus-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 5, "image_url": "https://assets.vogue.com/photos/6976990da10db17be4346de3/master/w_2560%2Cc_limit/00005-jacquemus-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 6, "image_url": "https://assets.vogue.com/photos/6976990d500f884d3764e144/master/w_2560%2Cc_limit/00006-jacquemus-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 7, "image_url": "https://assets.vogue.com/photos/69771b4c3a51d7ce73655e4a/master/w_2560%2Cc_limit/00001-jacquemus-fall-2026-ready-to-wear-detail-credit-gorunway.jpg", "caption": "Detail Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 8, "image_url": "https://assets.vogue.com/photos/69771b4c78a96f95fb5694c4/master/w_2560%2Cc_limit/00002-jacquemus-fall-2026-ready-to-wear-detail-credit-gorunway.jpg", "caption": "Detail Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 9, "image_url": "https://assets.vogue.com/photos/69771b4cca68728aefc7e4d3/master/w_2560%2Cc_limit/00003-jacquemus-fall-2026-ready-to-wear-detail-credit-gorunway.jpg", "caption": "Detail Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 10, "image_url": "https://assets.vogue.com/photos/69771b4e7a03ef1dea39b45a/master/w_2560%2Cc_limit/00004-jacquemus-fall-2026-ready-to-wear-detail-credit-gorunway.jpg", "caption": "Detail Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 11, "image_url": "https://assets.vogue.com/photos/69771b4f8c5c83bdc0710b9c/master/w_2560%2Cc_limit/00005-jacquemus-fall-2026-ready-to-wear-detail-credit-gorunway.jpg", "caption": "Detail Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 12, "image_url": "https://assets.vogue.com/photos/69771b50bde8fe02c91451ff/master/w_2560%2Cc_limit/00006-jacquemus-fall-2026-ready-to-wear-detail-credit-gorunway.jpg", "caption": "Detail Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 13, "image_url": "https://assets.vogue.com/photos/697699c29cbe3e57b49b61e6/master/w_1280%2Cc_limit/00001-jacquemus-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Fall 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 14, "image_url": "https://assets.vogue.com/photos/6862afefbab8fff78e3771ce/master/w_1280%2Cc_limit/00001-jacquemus-spring-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Spring 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 15, "image_url": "https://assets.vogue.com/photos/67967dcf0822beee8e5a6915/master/w_1280%2Cc_limit/00001-jacquemus-spring-2025-ready-to-wear-credit-gorunway.jpg", "caption": "Spring 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 16, "image_url": "https://assets.vogue.com/photos/666707dfa8354f0b8456d212/master/w_1280%2Cc_limit/00001-jacquemus-fall-24-ready-to-wear-credit-gorunway.jpg", "caption": "Fall 2024 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 17, "image_url": "https://assets.vogue.com/photos/65b7b42bd215206281c7c059/master/w_1280%2Cc_limit/00001-jacquemus-spring-2024-ready-to-wear-credit-gorunway.jpg", "caption": "Spring 2024 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Jacquemus", "look_number": 18, "image_url": "https://assets.vogue.com/photos/6499aff96d7f8002d20f7b8b/master/w_1280%2Cc_limit/00001-jacquemus-fall-2023-ready-to-wear-credit-gorunway.jpg", "caption": "Fall 2023 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jacquemus"}, {"season": "fall-2026-ready-to-wear", "designer": "Monique Lhuillier", "look_number": 1, "image_url": "https://assets.vogue.com/photos/696fba276c244160545c2c37/master/w_2560%2Cc_limit/00001-monique-lhuillier-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/monique-lhuillier"}, {"season": "fall-2026-ready-to-wear", "designer": "Monique Lhuillier", "look_number": 2, "image_url": "https://assets.vogue.com/photos/696fba274ba6ab794e2eb0a2/master/w_2560%2Cc_limit/00002-monique-lhuillier-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/monique-lhuillier"}, {"season": "fall-2026-ready-to-wear", "designer": "Monique Lhuillier", "look_number": 3, "image_url": "https://assets.vogue.com/photos/696fba2865c763529ccabfe4/master/w_2560%2Cc_limit/00003-monique-lhuillier-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/monique-lhuillier"}, {"season": "fall-2026-ready-to-wear", "designer": "Monique Lhuillier", "look_number": 4, "image_url": "https://assets.vogue.com/photos/696fba2c7c38987962cc9fb8/master/w_2560%2Cc_limit/00004-monique-lhuillier-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/monique-lhuillier"}, {"season": "fall-2026-ready-to-wear", "designer": "Monique Lhuillier", "look_number": 5, "image_url": "https://assets.vogue.com/photos/696fba2b6c244160545c2c39/master/w_2560%2Cc_limit/00005-monique-lhuillier-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/monique-lhuillier"}, {"season": "fall-2026-ready-to-wear", "designer": "Monique Lhuillier", "look_number": 6, "image_url": "https://assets.vogue.com/photos/696fba2ced16f568ce1d8012/master/w_2560%2Cc_limit/00006-monique-lhuillier-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/monique-lhuillier"}, {"season": "fall-2026-ready-to-wear", "designer": "Monique Lhuillier", "look_number": 7, "image_url": "https://assets.vogue.com/photos/696fbaa433393409a789f282/master/w_1280%2Cc_limit/00001-monique-lhuillier-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Fall 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/monique-lhuillier"}, {"season": "fall-2026-ready-to-wear", "designer": "Monique Lhuillier", "look_number": 8, "image_url": "https://assets.vogue.com/photos/68400890a544c8911ea056e3/master/w_1280%2Cc_limit/00001-monique-lhuillier-spring-2026-ready-to-wear-credit-brand.jpg", "caption": "Spring 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/monique-lhuillier"}, {"season": "fall-2026-ready-to-wear", "designer": "Monique Lhuillier", "look_number": 9, "image_url": "https://assets.vogue.com/photos/675024c92d2c6c1662531faa/master/w_1280%2Cc_limit/00001-monique-lhuillier-fall-2025-ready-to-wear-credit-brand.jpg", "caption": "Fall 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/monique-lhuillier"}, {"season": "fall-2026-ready-to-wear", "designer": "Monique Lhuillier", "look_number": 10, "image_url": "https://assets.vogue.com/photos/668d3abfc3b0769c2636ce35/master/w_1280%2Cc_limit/00001-monique-lhuillier-spring-2025-ready-to-wear-credit-brand.jpg", "caption": "Spring 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/monique-lhuillier"}, {"season": "fall-2026-ready-to-wear", "designer": "Monique Lhuillier", "look_number": 11, "image_url": "https://assets.vogue.com/photos/6712337426226b9f6bc06ff7/master/w_1280%2Cc_limit/00001-monique-lhuillier-fall-2024-ready-to-wear-credit-brand-kate-martin.jpg", "caption": "Fall 2024 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/monique-lhuillier"}, {"season": "fall-2026-ready-to-wear", "designer": "Monique Lhuillier", "look_number": 12, "image_url": "https://assets.vogue.com/photos/64ae6b71346bc631652128e9/master/w_1280%2Cc_limit/00001-monique-lhuillier-spring-2024-ready-to-wear-credit-brand.jpg", "caption": "Spring 2024 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/monique-lhuillier"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 1, "image_url": "https://assets.vogue.com/photos/696fe245604173444b639235/master/w_2560%2Cc_limit/00001-our-legacy-fall-2026-ready-to-wear-credit-lo-vahlstrom-brand.jpg", "caption": "Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 2, "image_url": "https://assets.vogue.com/photos/696fe245c4ffc7f2ead612c2/master/w_2560%2Cc_limit/00002-our-legacy-fall-2026-ready-to-wear-credit-lo-vahlstrom-brand.jpg", "caption": "Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 3, "image_url": "https://assets.vogue.com/photos/696fe240ff54c0289aa74347/master/w_2560%2Cc_limit/00003-our-legacy-fall-2026-ready-to-wear-credit-lo-vahlstrom-brand.jpg", "caption": "Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 4, "image_url": "https://assets.vogue.com/photos/696fe2477d4a87282081c16e/master/w_2560%2Cc_limit/00004-our-legacy-fall-2026-ready-to-wear-credit-lo-vahlstrom-brand.jpg", "caption": "Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 5, "image_url": "https://assets.vogue.com/photos/696fe24cf04db3c3f50a42b9/master/w_2560%2Cc_limit/00005-our-legacy-fall-2026-ready-to-wear-credit-lo-vahlstrom-brand.jpg", "caption": "Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 6, "image_url": "https://assets.vogue.com/photos/696fe24aec77c0a0431e55d2/master/w_2560%2Cc_limit/00006-our-legacy-fall-2026-ready-to-wear-credit-lo-vahlstrom-brand.jpg", "caption": "Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 7, "image_url": "https://assets.vogue.com/photos/696fe435c14518ab3e0a1cea/master/w_2560%2Cc_limit/00001-our-legacy-fall-2026-ready-to-wear-details-credit-lo-vahlstrom-brand.jpg", "caption": "Detail Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 8, "image_url": "https://assets.vogue.com/photos/696fe438f04db3c3f50a42c0/master/w_2560%2Cc_limit/00002-our-legacy-fall-2026-ready-to-wear-details-credit-lo-vahlstrom-brand.jpg", "caption": "Detail Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 9, "image_url": "https://assets.vogue.com/photos/696fe4386fdb7b116a635f9a/master/w_2560%2Cc_limit/00003-our-legacy-fall-2026-ready-to-wear-details-credit-lo-vahlstrom-brand.jpg", "caption": "Detail Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 10, "image_url": "https://assets.vogue.com/photos/696fe4399230f9312c7b8cd0/master/w_2560%2Cc_limit/00004-our-legacy-fall-2026-ready-to-wear-details-credit-lo-vahlstrom-brand.jpg", "caption": "Detail Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 11, "image_url": "https://assets.vogue.com/photos/696fe43cad6ea3ab07e88be3/master/w_2560%2Cc_limit/00005-our-legacy-fall-2026-ready-to-wear-details-credit-lo-vahlstrom-brand.jpg", "caption": "Detail Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 12, "image_url": "https://assets.vogue.com/photos/696fe43e4e96e2bd8e864475/master/w_2560%2Cc_limit/00006-our-legacy-fall-2026-ready-to-wear-details-credit-lo-vahlstrom-brand.jpg", "caption": "Detail Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 13, "image_url": "https://assets.vogue.com/photos/696fe047b09b27c365114b52/master/w_1280%2Cc_limit/00002-our-legacy-fall-2026-menswear-credit-lo-vahlstrom-brand.jpg", "caption": "Fall 2026 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 14, "image_url": "https://assets.vogue.com/photos/696fe69a4f78343b57d8eac6/master/w_1280%2Cc_limit/00001-our-legacy-fall-2026-ready-to-wear-credit-lo-vahlstrom-brand.jpg", "caption": "Fall 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 15, "image_url": "https://assets.vogue.com/photos/68528c179684cab810add3b5/master/w_1280%2Cc_limit/00001-our-legacy-spring-2026-ready-to-wear-credit-lo-vahlstrom.jpg", "caption": "Spring 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 16, "image_url": "https://assets.vogue.com/photos/6852960a52a4ea9ef1d04eae/master/w_1280%2Cc_limit/00001-our-legacy-spring-2026-menswear-credit-lo-vahlstrom.jpg", "caption": "Spring 2026 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 17, "image_url": "https://assets.vogue.com/photos/678b81054baee3d93c569ef0/master/w_1280%2Cc_limit/00001-our-legacy-fall-2025-menswear-credit-ola-rindal-brand.jpg", "caption": "Fall 2025 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Our Legacy", "look_number": 18, "image_url": "https://assets.vogue.com/photos/678cdeb05ae664c7a9fa7b88/master/w_1280%2Cc_limit/00001-our-legacy-fall-2025-ready-to-wear-credit-ola-rindal-brand.jpg", "caption": "Fall 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/our-legacy"}, {"season": "fall-2026-ready-to-wear", "designer": "Patou", "look_number": 1, "image_url": "https://assets.vogue.com/photos/697645bca917d14c5403d51e/master/w_2560%2Cc_limit/00001-patou-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/patou"}, {"season": "fall-2026-ready-to-wear", "designer": "Patou", "look_number": 2, "image_url": "https://assets.vogue.com/photos/697645bda10db17be4346dd6/master/w_2560%2Cc_limit/00002-patou-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/patou"}, {"season": "fall-2026-ready-to-wear", "designer": "Patou", "look_number": 3, "image_url": "https://assets.vogue.com/photos/697645be6f654bb1b47c7a51/master/w_2560%2Cc_limit/00003-patou-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/patou"}, {"season": "fall-2026-ready-to-wear", "designer": "Patou", "look_number": 4, "image_url": "https://assets.vogue.com/photos/697645bf39ec9adce5f0e3ab/master/w_2560%2Cc_limit/00004-patou-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/patou"}, {"season": "fall-2026-ready-to-wear", "designer": "Patou", "look_number": 5, "image_url": "https://assets.vogue.com/photos/697645c02a89118ff4529ff6/master/w_2560%2Cc_limit/00005-patou-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/patou"}, {"season": "fall-2026-ready-to-wear", "designer": "Patou", "look_number": 6, "image_url": "https://assets.vogue.com/photos/697645c1a865b7605c6583b5/master/w_2560%2Cc_limit/00006-patou-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/patou"}, {"season": "fall-2026-ready-to-wear", "designer": "Patou", "look_number": 7, "image_url": "https://assets.vogue.com/photos/697646283640df6129274026/master/w_1280%2Cc_limit/00001-patou-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Fall 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/patou"}, {"season": "fall-2026-ready-to-wear", "designer": "Patou", "look_number": 8, "image_url": "https://assets.vogue.com/photos/686a973b088291ec98828393/master/w_1280%2Cc_limit/FIO00020.jpg", "caption": "Spring 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/patou"}, {"season": "fall-2026-ready-to-wear", "designer": "Patou", "look_number": 9, "image_url": "https://assets.vogue.com/photos/679693eaa9f8d309c6e9b1a9/master/w_1280%2Cc_limit/00001-patou-fall-2025-ready-to-wear-credit-gorunway.jpg", "caption": "Fall 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/patou"}, {"season": "fall-2026-ready-to-wear", "designer": "Patou", "look_number": 10, "image_url": "https://assets.vogue.com/photos/667dc2ea01c62273b4fbeb69/master/w_1280%2Cc_limit/00001-patou-spring-2025-ready-to-wear-credit-brand.jpg", "caption": "Spring 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/patou"}, {"season": "fall-2026-ready-to-wear", "designer": "Patou", "look_number": 11, "image_url": "https://assets.vogue.com/photos/65b2bc611fb7de4c4d2f28d7/master/w_1280%2Cc_limit/00001-patou-fall-2024-ready-to-wear-credit-gorunway.jpg", "caption": "Fall 2024 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/patou"}, {"season": "fall-2026-ready-to-wear", "designer": "Patou", "look_number": 12, "image_url": "https://assets.vogue.com/photos/64a1c5c91c409097c6f3a3d5/master/w_1280%2Cc_limit/00001-patou-spring-2024-ready-to-wear-credit-gorunway.jpg", "caption": "Spring 2024 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/patou"}, {"season": "fall-2026-ready-to-wear", "designer": "Plan C", "look_number": 1, "image_url": "https://assets.vogue.com/photos/6968f766cf15a3928ad83a9d/master/w_2560%2Cc_limit/00001-plan-c-fall-2026-ready-to-wear-credit-bex-gunther-brand.jpg", "caption": "Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/plan-c"}, {"season": "fall-2026-ready-to-wear", "designer": "Plan C", "look_number": 2, "image_url": "https://assets.vogue.com/photos/6968f766694ac2de3f8dc184/master/w_2560%2Cc_limit/00002-plan-c-fall-2026-ready-to-wear-credit-bex-gunther-brand.jpg", "caption": "Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/plan-c"}, {"season": "fall-2026-ready-to-wear", "designer": "Plan C", "look_number": 3, "image_url": "https://assets.vogue.com/photos/6968f768e9f6ea06bb17bed5/master/w_2560%2Cc_limit/00003-plan-c-fall-2026-ready-to-wear-credit-bex-gunther-brand.jpg", "caption": "Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/plan-c"}, {"season": "fall-2026-ready-to-wear", "designer": "Plan C", "look_number": 4, "image_url": "https://assets.vogue.com/photos/6968f76ba71e7b37a1e3a877/master/w_2560%2Cc_limit/00004-plan-c-fall-2026-ready-to-wear-credit-bex-gunther-brand.jpg", "caption": "Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/plan-c"}, {"season": "fall-2026-ready-to-wear", "designer": "Plan C", "look_number": 5, "image_url": "https://assets.vogue.com/photos/6968f76a792824726c5c0882/master/w_2560%2Cc_limit/00005-plan-c-fall-2026-ready-to-wear-credit-bex-gunther-brand.jpg", "caption": "Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/plan-c"}, {"season": "fall-2026-ready-to-wear", "designer": "Plan C", "look_number": 6, "image_url": "https://assets.vogue.com/photos/6968f76ee2f5f12cdacb9271/master/w_2560%2Cc_limit/00006-plan-c-fall-2026-ready-to-wear-credit-bex-gunther-brand.jpg", "caption": "Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/plan-c"}, {"season": "fall-2026-ready-to-wear", "designer": "Plan C", "look_number": 7, "image_url": "https://assets.vogue.com/photos/6968f7e58e974b675eda069a/master/w_1280%2Cc_limit/00001-plan-c-fall-2026-ready-to-wear-credit-bex-gunther-brand.jpg", "caption": "Fall 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/plan-c"}, {"season": "fall-2026-ready-to-wear", "designer": "Plan C", "look_number": 8, "image_url": "https://assets.vogue.com/photos/684fe357df4e7201e9d28b10/master/w_1280%2Cc_limit/00003-plan-c-spring-2026-menswear-credit-brand.jpg", "caption": "Spring 2026 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/plan-c"}, {"season": "fall-2026-ready-to-wear", "designer": "Plan C", "look_number": 9, "image_url": "https://assets.vogue.com/photos/684fe210ca57828f378971c6/master/w_1280%2Cc_limit/00001-plan-c-spring-2026-ready-to-wear-credit-brand.jpg", "caption": "Spring 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/plan-c"}, {"season": "fall-2026-ready-to-wear", "designer": "Plan C", "look_number": 10, "image_url": "https://assets.vogue.com/photos/678789dc2c327bae8c53d825/master/w_1280%2Cc_limit/00001-plan-c-fall-2025-ready-to-wear-credit-brand.jpg", "caption": "Fall 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/plan-c"}, {"season": "fall-2026-ready-to-wear", "designer": "Plan C", "look_number": 11, "image_url": "https://assets.vogue.com/photos/67878b72a6f6b3c4c2d122cc/master/w_1280%2Cc_limit/00002-plan-c-fall-2025-menswear-credit-brand.jpg", "caption": "Fall 2025 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/plan-c"}, {"season": "fall-2026-ready-to-wear", "designer": "Plan C", "look_number": 12, "image_url": "https://assets.vogue.com/photos/66656e8c8de1b77e960d9183/master/w_1280%2Cc_limit/00001-plan-c-spring-2025-ready-to-wear-credit-brand.jpg", "caption": "Spring 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/plan-c"}, {"season": "fall-2026-ready-to-wear", "designer": "Pronounce", "look_number": 1, "image_url": "https://assets.vogue.com/photos/696bcd3fd88ad24c4f2fa118/master/w_2560%2Cc_limit/00001-pronounce-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/pronounce"}, {"season": "fall-2026-ready-to-wear", "designer": "Pronounce", "look_number": 2, "image_url": "https://assets.vogue.com/photos/696bcd3e1f1acb00a3aabd3a/master/w_2560%2Cc_limit/00002-pronounce-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/pronounce"}, {"season": "fall-2026-ready-to-wear", "designer": "Pronounce", "look_number": 3, "image_url": "https://assets.vogue.com/photos/696bcd3efebf2b18b115f453/master/w_2560%2Cc_limit/00003-pronounce-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/pronounce"}, {"season": "fall-2026-ready-to-wear", "designer": "Pronounce", "look_number": 4, "image_url": "https://assets.vogue.com/photos/696bcd424f2ffff295e1d813/master/w_2560%2Cc_limit/00004-pronounce-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/pronounce"}, {"season": "fall-2026-ready-to-wear", "designer": "Pronounce", "look_number": 5, "image_url": "https://assets.vogue.com/photos/696bcd43a2bdc500a81a5d14/master/w_2560%2Cc_limit/00005-pronounce-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/pronounce"}, {"season": "fall-2026-ready-to-wear", "designer": "Pronounce", "look_number": 6, "image_url": "https://assets.vogue.com/photos/696bcd43ff788ce943c48f38/master/w_2560%2Cc_limit/00006-pronounce-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/pronounce"}, {"season": "fall-2026-ready-to-wear", "designer": "Pronounce", "look_number": 7, "image_url": "https://assets.vogue.com/photos/696bcd1e75466adc642e5037/master/w_1280%2Cc_limit/00009-pronounce-fall-2026-ready-to-wear-credit-gorunway.jpg", "caption": "Fall 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/pronounce"}, {"season": "fall-2026-ready-to-wear", "designer": "Pronounce", "look_number": 8, "image_url": "https://assets.vogue.com/photos/696b94ac7182aa35a6e46620/master/w_1280%2Cc_limit/OBY00008.jpg", "caption": "Fall 2026 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/pronounce"}, {"season": "fall-2026-ready-to-wear", "designer": "Pronounce", "look_number": 9, "image_url": "https://assets.vogue.com/photos/68569447531095074cbea8e9/master/w_1280%2Cc_limit/00001-pronounce-spring-2026-menswear-credit-gorunway.jpg", "caption": "Spring 2026 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/pronounce"}, {"season": "fall-2026-ready-to-wear", "designer": "Pronounce", "look_number": 10, "image_url": "https://assets.vogue.com/photos/678ba157de7cbddfa038567d/master/w_1280%2Cc_limit/00001-pronounce-fall-2025-menswear-credit-gorunway.jpg", "caption": "Fall 2025 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/pronounce"}, {"season": "fall-2026-ready-to-wear", "designer": "Pronounce", "look_number": 11, "image_url": "https://assets.vogue.com/photos/666dc26b3f93865455f6c583/master/w_1280%2Cc_limit/00001-pronounce-spring-2025-menswear-credit-brand.jpg", "caption": "Spring 2025 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/pronounce"}, {"season": "fall-2026-ready-to-wear", "designer": "Pronounce", "look_number": 12, "image_url": "https://assets.vogue.com/photos/65a3ce14f760ccf736c98d39/master/w_1280%2Cc_limit/00001-pronounceb-fall-2024-menswear-credit-gorunway.jpg", "caption": "Fall 2024 Menswear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/pronounce"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 1, "image_url": "https://assets.vogue.com/photos/697a7267024d78b585bf75c1/master/w_2560%2Cc_limit/00001-toteme-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 2, "image_url": "https://assets.vogue.com/photos/697a7267059e3fea05b3ec7f/master/w_2560%2Cc_limit/00002-toteme-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 3, "image_url": "https://assets.vogue.com/photos/697a726627e5df4b431d738d/master/w_2560%2Cc_limit/00003-toteme-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 4, "image_url": "https://assets.vogue.com/photos/697a7269cf3ea91c30bd47a9/master/w_2560%2Cc_limit/00004-toteme-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 5, "image_url": "https://assets.vogue.com/photos/697a726af7bbf554af311d1f/master/w_2560%2Cc_limit/00005-toteme-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 6, "image_url": "https://assets.vogue.com/photos/697a726a3cec2c8761b77e6a/master/w_2560%2Cc_limit/00006-toteme-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 7, "image_url": "https://assets.vogue.com/photos/697b6ccb0dc0ca27e0b7b4db/master/w_2560%2Cc_limit/00001a-toteme-fall-2026-ready-to-wear-details-credit-brand.jpg", "caption": "Detail Look 1", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 8, "image_url": "https://assets.vogue.com/photos/697b6ccd75ef65c26ed6fafb/master/w_2560%2Cc_limit/00002a-toteme-fall-2026-ready-to-wear-details-credit-brand.jpg", "caption": "Detail Look 2", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 9, "image_url": "https://assets.vogue.com/photos/697b6ccd24253e9d5692011c/master/w_2560%2Cc_limit/00002b-toteme-fall-2026-ready-to-wear-details-credit-brand.jpg", "caption": "Detail Look 3", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 10, "image_url": "https://assets.vogue.com/photos/697b6ccf6ab0c538c9e6ce72/master/w_2560%2Cc_limit/00003a-toteme-fall-2026-ready-to-wear-details-credit-brand.jpg", "caption": "Detail Look 4", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 11, "image_url": "https://assets.vogue.com/photos/697b6cd19e38dedeba72b6a5/master/w_2560%2Cc_limit/00003b-toteme-fall-2026-ready-to-wear-details-credit-brand.jpg", "caption": "Detail Look 5", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 12, "image_url": "https://assets.vogue.com/photos/697b6cd2336c71c0967dbaec/master/w_2560%2Cc_limit/00003c-toteme-fall-2026-ready-to-wear-details-credit-brand.jpg", "caption": "Detail Look 6", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 13, "image_url": "https://assets.vogue.com/photos/697a72594b5f9005768088e3/master/w_1280%2Cc_limit/00001-toteme-fall-2026-ready-to-wear-credit-brand.jpg", "caption": "Fall 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 14, "image_url": "https://assets.vogue.com/photos/68c85bed78ca5552122b8d4a/master/w_1280%2Cc_limit/00001-toteme-spring-2026-ready-to-wear-credit-brand.jpg", "caption": "Spring 2026 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 15, "image_url": "https://assets.vogue.com/photos/6797da593ba4d17f3ab0f611/master/w_1280%2Cc_limit/00001-toteme-fall-2025-ready-to-wear-credit-brand.jpg", "caption": "Fall 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 16, "image_url": "https://assets.vogue.com/photos/66e096e112ac0f23f9ae6edf/master/w_1280%2Cc_limit/00001-toteme-spring-2025-ready-to-wear-credit-brand.jpg", "caption": "Spring 2025 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 17, "image_url": "https://assets.vogue.com/photos/65af7dca3a2e7db8a989b28e/master/w_1280%2Cc_limit/00001-toteme-fall-2024-ready-to-wear-credit-brand.jpg", "caption": "Fall 2024 Ready-to-Wear", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}, {"season": "fall-2026-ready-to-wear", "designer": "Toteme", "look_number": 18, "image_url": "https://assets.vogue.com/photos/5c7e5bf866e95f2d5d4386dd/master/w_1280%2Cc_limit/00001-Toteme-Stockholm-Fall-2019.jpg", "caption": "Stockholm Fall 2019", "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/toteme"}];
+
+  const state = {
+    q: "",
+    season: "All",
+    designer: "All",
+    sort: "designer_look",
+    onlyStarred: false,
+    autoLoad: true,
+    pageSize: 80,
+    page: 1,
+    filtered: [],
+    starred: new Set(JSON.parse(localStorage.getItem("vogue_starred__fall-2026-ready-to-wear") || "[]")),
+    modalIndex: -1
+  };
+
+  const elQ = document.getElementById("q");
+  const elSeason = document.getElementById("season");
+  const elDesigner = document.getElementById("designer");
+  const elSort = document.getElementById("sort");
+  const elOnlyStarred = document.getElementById("onlyStarred");
+  const elAutoLoad = document.getElementById("autoLoad");
+  const elReset = document.getElementById("reset");
+  const elExport = document.getElementById("export");
+  const elGrid = document.getElementById("grid");
+  const elLoadMore = document.getElementById("loadMore");
+  const elStatus = document.getElementById("status");
+  const elKpiTotal = document.getElementById("kpiTotal");
+  const elKpiFiltered = document.getElementById("kpiFiltered");
+  const elKpiDesigners = document.getElementById("kpiDesigners");
+  const elSentinel = document.getElementById("sentinel");
+
+  const elModal = document.getElementById("modal");
+  const elModalClose = document.getElementById("modalClose");
+  const elModalImg = document.getElementById("modalImg");
+  const elModalDesigner = document.getElementById("modalDesigner");
+  const elModalMeta = document.getElementById("modalMeta");
+  const elModalCaption = document.getElementById("modalCaption");
+  const elOpenSource = document.getElementById("openSource");
+  const elOpenImage = document.getElementById("openImage");
+  const elToggleStar = document.getElementById("toggleStar");
+  const elPrev = document.getElementById("prev");
+  const elNext = document.getElementById("next");
+  const elModalIndex = document.getElementById("modalIndex");
+  const elModalCount = document.getElementById("modalCount");
+
+  const norm = (s) => (s || "").toString().trim();
+  const toKey = (item) => `${norm(item.designer)}__${norm(item.season)}__${norm(item.look_number)}__${norm(item.image_url)}`;
+  const uniq = (arr) => Array.from(new Set(arr)).filter(Boolean);
+
+  function csvEscape(v) {
+    const s = (v ?? "").toString();
+    if (/[",\n]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
+    return s;
+  }
+  function toCSV(rows) {
+    const headers = ["season","designer","look_number","image_url","caption","source_url"];
+    const lines = [headers.join(",")];
+    for (const r of rows) lines.push(headers.map(h => csvEscape(r[h])).join(","));
+    return lines.join("\n");
+  }
+  function download(filename, text) {
+    const blob = new Blob([text], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function initSelects() {
+    const seasons = ["All", ...uniq(DATA.map(d => norm(d.season))).sort((a,b)=>a.localeCompare(b))];
+    const designers = ["All", ...uniq(DATA.map(d => norm(d.designer))).sort((a,b)=>a.localeCompare(b))];
+    elSeason.innerHTML = seasons.map(s => `<option value="${s}">${s}</option>`).join("");
+    elDesigner.innerHTML = designers.map(s => `<option value="${s}">${s}</option>`).join("");
+  }
+
+  function updateKpis() {
+    elKpiTotal.textContent = DATA.length.toString();
+    elKpiFiltered.textContent = state.filtered.length.toString();
+    elKpiDesigners.textContent = uniq(DATA.map(d => norm(d.designer))).length.toString();
+  }
+
+  function applyFilters() {
+    const q = state.q.toLowerCase();
+    let rows = DATA.filter(d => {
+      const okSeason = state.season === "All" || norm(d.season) === state.season;
+      const okDesigner = state.designer === "All" || norm(d.designer) === state.designer;
+      const hay = `${norm(d.designer)} ${norm(d.caption)} ${norm(d.look_number)} ${norm(d.season)}`.toLowerCase();
+      const okQ = !q || hay.includes(q);
+      const okStar = !state.onlyStarred || state.starred.has(toKey(d));
+      return okSeason && okDesigner && okQ && okStar;
+    });
+
+    if (state.sort === "designer_look") {
+      rows.sort((a,b)=> {
+        const da = norm(a.designer).localeCompare(norm(b.designer));
+        if (da !== 0) return da;
+        return (parseFloat(a.look_number)||0) - (parseFloat(b.look_number)||0);
+      });
+    } else if (state.sort === "look") {
+      rows.sort((a,b)=> (parseFloat(a.look_number)||0) - (parseFloat(b.look_number)||0));
+    } else if (state.sort === "designer") {
+      rows.sort((a,b)=> norm(a.designer).localeCompare(norm(b.designer)));
+    } else if (state.sort === "random") {
+      for (let i = rows.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [rows[i], rows[j]] = [rows[j], rows[i]];
+      }
+    }
+
+    state.filtered = rows;
+    state.page = 1;
+    render();
+    updateKpis();
+  }
+
+  function toggleStar(key, btn) {
+    if (state.starred.has(key)) state.starred.delete(key);
+    else state.starred.add(key);
+    localStorage.setItem("vogue_starred__fall-2026-ready-to-wear", JSON.stringify(Array.from(state.starred)));
+    if (btn) btn.dataset.starred = state.starred.has(key) ? "true" : "false";
+    if (state.onlyStarred) applyFilters();
+  }
+
+  function render() {
+    const max = state.page * state.pageSize;
+    const slice = state.filtered.slice(0, max);
+
+    elGrid.innerHTML = "";
+    for (let idx = 0; idx < slice.length; idx++) {
+      const item = slice[idx];
+      const key = toKey(item);
+
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <span class="badge">${item.season || ""}</span>
+        <div class="actions">
+          <button class="iconbtn" title="Star" data-key="${key}">★</button>
+        </div>
+        <img class="thumb" loading="lazy" src="${item.image_url}" alt="${item.caption || "Look"}" />
+        <div class="meta">
+          <div class="top">
+            <div class="designer" title="${item.designer}">${item.designer}</div>
+            <div class="look">#${item.look_number}</div>
+          </div>
+          <div class="caption" title="${item.caption || ""}">${item.caption || ""}</div>
+        </div>
+      `;
+
+      const starBtn = card.querySelector(".iconbtn");
+      starBtn.dataset.starred = state.starred.has(key) ? "true" : "false";
+      starBtn.addEventListener("click", (e)=>{ e.stopPropagation(); toggleStar(key, starBtn); });
+
+      card.addEventListener("click", ()=> openModal(idx));
+      elGrid.appendChild(card);
+    }
+
+    const shown = slice.length;
+    elStatus.textContent = `Showing ${shown} of ${state.filtered.length}`;
+    elLoadMore.style.display = shown < state.filtered.length ? "inline-flex" : "none";
+  }
+
+  function openModal(filteredIndex) {
+    state.modalIndex = filteredIndex;
+    const item = state.filtered[filteredIndex];
+    if (!item) return;
+
+    const key = toKey(item);
+    elModalImg.src = item.image_url;
+    elModalImg.alt = item.caption || "Look";
+    elModalDesigner.textContent = item.designer || "";
+    elModalMeta.textContent = `${item.season || ""} • Look #${item.look_number}`;
+    elModalCaption.textContent = item.caption || "";
+    elOpenSource.href = item.source_url || item.image_url;
+    elOpenImage.href = item.image_url;
+    elToggleStar.textContent = state.starred.has(key) ? "Unstar" : "Star";
+    elModalIndex.textContent = (filteredIndex + 1).toString();
+    elModalCount.textContent = state.filtered.length.toString();
+    elModal.classList.add("open");
+  }
+  function closeModal() { elModal.classList.remove("open"); }
+  function modalStep(delta) {
+    if (state.modalIndex < 0) return;
+    let next = state.modalIndex + delta;
+    if (next < 0) next = 0;
+    if (next >= state.filtered.length) next = state.filtered.length - 1;
+    openModal(next);
+  }
+
+  elQ.addEventListener("input", (e)=>{ state.q = e.target.value; applyFilters(); });
+  elSeason.addEventListener("change", (e)=>{ state.season = e.target.value; applyFilters(); });
+  elDesigner.addEventListener("change", (e)=>{ state.designer = e.target.value; applyFilters(); });
+  elSort.addEventListener("change", (e)=>{ state.sort = e.target.value; applyFilters(); });
+  elOnlyStarred.addEventListener("change", (e)=>{ state.onlyStarred = e.target.checked; applyFilters(); });
+  elAutoLoad.addEventListener("change", (e)=>{ state.autoLoad = e.target.checked; });
+
+  elReset.addEventListener("click", ()=>{
+    state.q=""; state.season="All"; state.designer="All"; state.sort="designer_look"; state.onlyStarred=false;
+    elQ.value=""; elSeason.value="All"; elDesigner.value="All"; elSort.value="designer_look"; elOnlyStarred.checked=false;
+    applyFilters();
+  });
+
+  elExport.addEventListener("click", ()=>{
+    download("fall-2026-ready-to-wear__filtered.csv", toCSV(state.filtered));
+  });
+
+  elLoadMore.addEventListener("click", ()=>{ state.page += 1; render(); });
+
+  const io = new IntersectionObserver((entries)=>{
+    if (!state.autoLoad) return;
+    for (const e of entries) {
+      if (e.isIntersecting && (state.page * state.pageSize) < state.filtered.length) {
+        state.page += 1; render();
+      }
+    }
+  }, { rootMargin: "600px" });
+  io.observe(elSentinel);
+
+  elModalClose.addEventListener("click", closeModal);
+  elModal.addEventListener("click", (e)=>{ if (e.target === elModal) closeModal(); });
+  elPrev.addEventListener("click", ()=> modalStep(-1));
+  elNext.addEventListener("click", ()=> modalStep(1));
+  elToggleStar.addEventListener("click", ()=>{
+    const item = state.filtered[state.modalIndex];
+    if (!item) return;
+    toggleStar(toKey(item), null);
+    elToggleStar.textContent = state.starred.has(toKey(item)) ? "Unstar" : "Star";
+    render();
+  });
+
+  window.addEventListener("keydown", (e)=>{
+    if (e.key === "Escape") closeModal();
+    if (!elModal.classList.contains("open")) return;
+    if (e.key === "ArrowLeft") modalStep(-1);
+    if (e.key === "ArrowRight") modalStep(1);
+  });
+
+  initSelects();
+  applyFilters();
+</script>
+</body>
+</html>
