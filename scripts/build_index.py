@@ -1,6 +1,6 @@
 from pathlib import Path
 
-SITE_DIR = Path("site")
+SITE_DIR = Path("docs")
 SEASONS_DIR = SITE_DIR / "seasons"
 
 def main():
