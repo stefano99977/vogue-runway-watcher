@@ -2,7 +2,7 @@ name: Vogue Runway Watcher
 
 on:
   schedule:
-    # Daily at 07:00 UTC (~08:00 Madrid in winter; ~09:00 Madrid in summer)
+    # Daily at 07:00 UTC (~08:00 Madrid winter / ~09:00 summer)
     - cron: "0 7 * * *"
   workflow_dispatch: {}
 
@@ -36,6 +36,37 @@ jobs:
           echo "exit_code=$code" >> $GITHUB_OUTPUT
           exit 0
 
+      # ─────────────────────────────────────────────
+      # Prepare email content (ONLY if new seasons)
+      # ─────────────────────────────────────────────
+      - name: Prepare email content
+        id: email
+        if: steps.detect.outputs.exit_code == '1'
+        run: |
+          python - << 'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+
+          BASE = "https://stefano99977.github.io/vogue-runway-watcher/"
+
+          data = json.loads(Path("data/new_seasons.json").read_text(encoding="utf-8"))
+          seasons = data.get("new_seasons", [])
+
+          seasons_str = ", ".join(seasons)
+          files_str = ", ".join([f"{s}.html" for s in seasons])
+          links = "\n".join([f"- {BASE}seasons/{s}.html" for s in seasons])
+
+          print(f"seasons={seasons_str}")
+          print(f"files={files_str}")
+          print("links<<EOF")
+          print(links)
+          print("EOF")
+          print(f"index={BASE}")
+          PY
+
+      # ─────────────────────────────────────────────
+      # Process new seasons
+      # ─────────────────────────────────────────────
       - name: Process new seasons (scrape → build gallery → build index)
         if: steps.detect.outputs.exit_code == '1'
         run: |
@@ -53,29 +84,64 @@ jobs:
               raise SystemExit(0)
 
           for season in new:
-              # 1) scrape season → CSV
+              # 1) Scrape season → CSV
               subprocess.check_call([sys.executable, "scripts/scrape_season.py", season])
 
-              # 2) build gallery → HTML
+              # 2) Build gallery → HTML (docs/)
               csv_path = f"data/seasons/{season}.csv"
               html_path = f"docs/seasons/{season}.html"
               title = f"Vogue {season.replace('-', ' ').title()} — Image Gallery"
-              subprocess.check_call([sys.executable, "scripts/build_gallery.py", csv_path, html_path, title])
+              subprocess.check_call([
+                  sys.executable,
+                  "scripts/build_gallery.py",
+                  csv_path,
+                  html_path,
+                  title
+              ])
 
-          # 3) rebuild site index
+          # 3) Rebuild index → docs/index.html
           subprocess.check_call([sys.executable, "scripts/build_index.py"])
           PY
 
+      # ─────────────────────────────────────────────
+      # Commit changes
+      # ─────────────────────────────────────────────
       - name: Commit and push changes
         if: steps.detect.outputs.exit_code != '2'
         run: |
           git config user.name "runway-bot"
           git config user.email "runway-bot@users.noreply.github.com"
 
-          # Add everything that exists (avoids failing when /site doesn't exist yet)
           git add -A
-
-          # Commit only if there are changes
           git commit -m "Update Vogue watcher state/output" || exit 0
           git push
 
+      # ─────────────────────────────────────────────
+      # Email notification (ONLY after successful push)
+      # ─────────────────────────────────────────────
+      - name: Email notification – new Vogue season added
+        if: steps.detect.outputs.exit_code == '1'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          secure: false
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_FROM }}
+          subject: "🆕 New Vogue runway season published"
+          body: |
+            A new Vogue runway season has been detected and published.
+
+            Season(s):
+            ${{ steps.email.outputs.seasons }}
+
+            File(s):
+            ${{ steps.email.outputs.files }}
+
+            Gallery link(s):
+            ${{ steps.email.outputs.links }}
+
+            Index:
+            ${{ steps.email.outputs.index }}
