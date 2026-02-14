@@ -23,6 +23,8 @@ EXCLUDE = {
     "/fashion-shows/designers",
     "/fashion-shows/featured",
     "/fashion-shows/image-archive",
+    "/fashion-shows/schedule"
+
 }
 
 def fetch(url: str) -> str:
