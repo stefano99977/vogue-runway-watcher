@@ -27,7 +27,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Detect new seasons
+      - name: Detect new shows
         id: detect
         run: |
           set +e
@@ -37,7 +37,7 @@ jobs:
           exit 0
 
       # ─────────────────────────────────────────────
-      # Prepare email content (ONLY if new seasons)
+      # Prepare email content (ONLY if new shows)
       # ─────────────────────────────────────────────
       - name: Prepare email content
         id: email
@@ -49,15 +49,14 @@ jobs:
 
           BASE = "https://stefano99977.github.io/vogue-runway-watcher/"
 
-          data = json.loads(Path("data/new_seasons.json").read_text(encoding="utf-8"))
-          seasons = data.get("new_seasons", [])
+          data = json.loads(Path("data/new_shows.json").read_text(encoding="utf-8"))
+          shows = data.get("new_shows", [])
 
-          seasons_str = ", ".join(seasons)
-          files_str = ", ".join([f"{s}.html" for s in seasons])
-          links = "\n".join([f"- {BASE}seasons/{s}.html" for s in seasons])
+          files = [f"{s.replace('/', '--')}.html" for s in shows]
+          links = "\n".join([f"- {BASE}seasons/{f}" for f in files])
 
-          print(f"seasons={seasons_str}")
-          print(f"files={files_str}")
+          print(f"shows={', '.join(shows)}")
+          print(f"files={', '.join(files)}")
           print("links<<EOF")
           print(links)
           print("EOF")
@@ -65,32 +64,43 @@ jobs:
           PY
 
       # ─────────────────────────────────────────────
-      # Process new seasons
+      # Process new shows
       # ─────────────────────────────────────────────
-      - name: Process new seasons (scrape → build gallery → build index)
+      - name: Process new shows (scrape → build gallery → build index)
         if: steps.detect.outputs.exit_code == '1'
         run: |
           python - << 'PY'
-          import json, sys, subprocess
+          import json
+          import sys
+          import subprocess
           from pathlib import Path
 
-          new_file = Path("data/new_seasons.json")
-          if not new_file.exists():
-              raise SystemExit("Expected data/new_seasons.json but file not found.")
+          def safe_name(show_slug: str) -> str:
+              return show_slug.replace("/", "--")
 
-          new = json.loads(new_file.read_text(encoding="utf-8")).get("new_seasons", [])
+          def title_from_show(show_slug: str) -> str:
+              season, designer = show_slug.split("/", 1)
+              season_label = season.replace("-", " ").title()
+              designer_label = designer.replace("-", " ").title()
+              return f"Vogue {season_label} — {designer_label}"
+
+          new_file = Path("data/new_shows.json")
+          if not new_file.exists():
+              raise SystemExit("Expected data/new_shows.json but file not found.")
+
+          new = json.loads(new_file.read_text(encoding="utf-8")).get("new_shows", [])
           if not new:
-              print("No new seasons listed; nothing to do.")
+              print("No new shows listed; nothing to do.")
               raise SystemExit(0)
 
-          for season in new:
-              # 1) Scrape season → CSV
-              subprocess.check_call([sys.executable, "scripts/scrape_season.py", season])
+          for show in new:
+              subprocess.check_call([sys.executable, "scripts/scrape_season.py", show])
 
-              # 2) Build gallery → HTML (docs/)
-              csv_path = f"data/seasons/{season}.csv"
-              html_path = f"docs/seasons/{season}.html"
-              title = f"Vogue {season.replace('-', ' ').title()} — Image Gallery"
+              name = safe_name(show)
+              csv_path = f"data/seasons/{name}.csv"
+              html_path = f"docs/seasons/{name}.html"
+              title = title_from_show(show)
+
               subprocess.check_call([
                   sys.executable,
                   "scripts/build_gallery.py",
@@ -99,7 +109,6 @@ jobs:
                   title
               ])
 
-          # 3) Rebuild index → docs/index.html
           subprocess.check_call([sys.executable, "scripts/build_index.py"])
           PY
 
@@ -119,7 +128,7 @@ jobs:
       # ─────────────────────────────────────────────
       # Email notification (ONLY after successful push)
       # ─────────────────────────────────────────────
-      - name: Email notification – new Vogue season added
+      - name: Email notification – new Vogue show added
         if: steps.detect.outputs.exit_code == '1'
         uses: dawidd6/action-send-mail@v3
         with:
@@ -130,12 +139,12 @@ jobs:
           password: ${{ secrets.SMTP_PASSWORD }}
           to: ${{ secrets.EMAIL_TO }}
           from: ${{ secrets.EMAIL_FROM }}
-          subject: "🆕 New Vogue runway season published"
+          subject: "🆕 New Vogue runway show published"
           body: |
-            A new Vogue runway season has been detected and published.
+            A new Vogue runway show has been detected and published.
 
-            Season(s):
-            ${{ steps.email.outputs.seasons }}
+            Show(s):
+            ${{ steps.email.outputs.shows }}
 
             File(s):
             ${{ steps.email.outputs.files }}
