@@ -1,5 +1,4 @@
 import csv
-import time
 from pathlib import Path
 from urllib.parse import urljoin
 
@@ -8,10 +7,10 @@ from bs4 import BeautifulSoup
 
 BASE = "https://www.vogue.com"
 HEADERS = {"User-Agent": "RunwayWatcher/1.0 (automation)"}
-RATE_LIMIT = 2.0
 
 DATA_DIR = Path("data/seasons")
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def fetch(url: str) -> str | None:
     try:
@@ -22,119 +21,46 @@ def fetch(url: str) -> str | None:
         print(f"Error fetching {url}: {e}")
         return None
 
-def get_show_links(season_slug: str) -> list[str]:
-    sources = [
-        f"{BASE}/fashion-shows/{season_slug}",   # existing season page
-        f"{BASE}/fashion-shows",                 # new fallback/global page
-    ]
 
-    links: list[str] = []
-    seen = set()
+def normalize_show_ref(show_ref: str) -> tuple[str, str, str]:
+    """
+    Accepts either:
+      - fall-2026-ready-to-wear/loewe
+      - https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/loewe
+    Returns:
+      (season_slug, designer_slug, show_url)
+    """
+    show_ref = show_ref.strip()
 
-    for source_url in sources:
-        print(f"🔭 Scanning page: {source_url}")
-        html = fetch(source_url)
-        if not html:
-            continue
+    if show_ref.startswith("http://") or show_ref.startswith("https://"):
+        show_url = show_ref.split("?")[0].rstrip("/")
+        parts = show_url.replace(BASE, "").strip("/").split("/")
+        if len(parts) != 3 or parts[0] != "fashion-shows":
+            raise ValueError(f"Unsupported Vogue show URL: {show_ref}")
+        season_slug = parts[1]
+        designer_slug = parts[2]
+        return season_slug, designer_slug, show_url
 
-        soup = BeautifulSoup(html, "html.parser")
+    parts = show_ref.strip("/").split("/")
+    if len(parts) != 2:
+        raise ValueError(
+            "Expected show ref like 'fall-2026-ready-to-wear/loewe' or a full Vogue show URL"
+        )
 
-        for a in soup.select("a[href]"):
-            href = a.get("href")
-            if not href:
-                continue
-
-            full = urljoin(BASE, href.split("?")[0])
-
-            # Skip gallery sub-pages
-            if "/gallery" in full:
-                continue
-
-            # Keep only show pages for this season:
-            # /fashion-shows/<season-slug>/<designer-slug>
-            prefix = f"{BASE}/fashion-shows/{season_slug}/"
-            if not full.startswith(prefix):
-                continue
-
-            parts = full.replace(BASE, "").strip("/").split("/")
-
-            # Expect: fashion-shows / <season-slug> / <designer-slug>
-            if len(parts) == 3 and parts[0] == "fashion-shows" and parts[1] == season_slug:
-                if full not in seen:
-                    seen.add(full)
-                    links.append(full)
-
-    return sorted(links)
+    season_slug, designer_slug = parts
+    show_url = f"{BASE}/fashion-shows/{season_slug}/{designer_slug}"
+    return season_slug, designer_slug, show_url
 
 
-def extract_show_data(season_slug: str, show_url: str) -> list[dict]:
+def safe_name(season_slug: str, designer_slug: str) -> str:
+    return f"{season_slug}--{designer_slug}"
+
+
+def extract_show_data(season_slug: str, designer_slug: str, show_url: str) -> list[dict]:
+    print(f"🔭 Show page: {show_url}")
     html = fetch(show_url)
     if not html:
         return []
 
     soup = BeautifulSoup(html, "html.parser")
-
-    designer = show_url.rstrip("/").split("/")[-1].replace("-", " ").title()
-
-    looks: list[dict] = []
-    for idx, fig in enumerate(soup.find_all("figure")):
-        img = fig.find("img")
-        if not img:
-            continue
-
-        img_src = img.get("data-src") or img.get("src")
-        if not img_src:
-            continue
-
-        clean_img_url = urljoin(BASE, img_src.split("?")[0])
-
-        cap_tag = fig.find("figcaption")
-        caption = cap_tag.get_text(strip=True) if cap_tag else ""
-
-        looks.append({
-            "season": season_slug,
-            "designer": designer,
-            "look_number": idx + 1,
-            "image_url": clean_img_url,
-            "caption": caption,
-            "source_url": show_url
-        })
-
-    return looks
-
-def write_csv(season_slug: str, rows: list[dict]) -> Path:
-    out = DATA_DIR / f"{season_slug}.csv"
-    with out.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(
-            f,
-            fieldnames=["season", "designer", "look_number", "image_url", "caption", "source_url"]
-        )
-        writer.writeheader()
-        writer.writerows(rows)
-    return out
-
-def main(season_slug: str) -> int:
-    show_urls = get_show_links(season_slug)
-    print(f"Found {len(show_urls)} collections for {season_slug}.")
-
-    all_rows: list[dict] = []
-    for i, url in enumerate(show_urls, 1):
-        print(f"[{i}/{len(show_urls)}] Scraping {url}")
-        all_rows.extend(extract_show_data(season_slug, url))
-        time.sleep(RATE_LIMIT)
-
-    if not all_rows:
-        print("⚠️ No looks extracted. Vogue layout may have changed.")
-        return 2
-
-    out = write_csv(season_slug, all_rows)
-    print(f"✅ Wrote {len(all_rows)} looks → {out}")
-    return 0
-
-if __name__ == "__main__":
-    import sys
-    if len(sys.argv) != 2:
-        print("Usage: python scripts/scrape_season.py <season-slug>")
-        raise SystemExit(2)
-    raise SystemExit(main(sys.argv[1]))
-
+    designer = designer_sl_
