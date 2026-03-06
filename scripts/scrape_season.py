@@ -1,4 +1,5 @@
 import csv
+import sys
 from pathlib import Path
 from urllib.parse import urljoin
 
@@ -63,4 +64,69 @@ def extract_show_data(season_slug: str, designer_slug: str, show_url: str) -> li
         return []
 
     soup = BeautifulSoup(html, "html.parser")
-    designer = designer_sl_
+    designer = designer_slug.replace("-", " ").title()
+
+    looks: list[dict] = []
+    seen_images = set()
+
+    for fig in soup.find_all("figure"):
+        img = fig.find("img")
+        if not img:
+            continue
+
+        img_src = img.get("data-src") or img.get("src")
+        if not img_src:
+            continue
+
+        clean_img_url = urljoin(BASE, img_src.split("?")[0])
+
+        if clean_img_url in seen_images:
+            continue
+        seen_images.add(clean_img_url)
+
+        cap_tag = fig.find("figcaption")
+        caption = cap_tag.get_text(strip=True) if cap_tag else ""
+
+        looks.append({
+            "season": season_slug,
+            "designer": designer,
+            "look_number": len(looks) + 1,
+            "image_url": clean_img_url,
+            "caption": caption,
+            "source_url": show_url,
+        })
+
+    return looks
+
+
+def write_csv(season_slug: str, designer_slug: str, rows: list[dict]) -> Path:
+    out = DATA_DIR / f"{safe_name(season_slug, designer_slug)}.csv"
+    with out.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f,
+            fieldnames=["season", "designer", "look_number", "image_url", "caption", "source_url"]
+        )
+        writer.writeheader()
+        writer.writerows(rows)
+    return out
+
+
+def main(show_ref: str) -> int:
+    season_slug, designer_slug, show_url = normalize_show_ref(show_ref)
+    rows = extract_show_data(season_slug, designer_slug, show_url)
+
+    if not rows:
+        print("⚠️ No looks extracted. Vogue layout may have changed.")
+        return 2
+
+    out = write_csv(season_slug, designer_slug, rows)
+    print(f"✅ Wrote {len(rows)} looks → {out}")
+    return 0
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python scripts/scrape_season.py <season/designer-slug-or-full-url>")
+        raise SystemExit(2)
+
+    raise SystemExit(main(sys.argv[1]))
