@@ -23,35 +23,49 @@ def fetch(url: str) -> str | None:
         return None
 
 def get_show_links(season_slug: str) -> list[str]:
-    season_url = f"{BASE}/fashion-shows/{season_slug}"
-    print(f"🔭 Season page: {season_url}")
-    html = fetch(season_url)
-    if not html:
-        return []
+    sources = [
+        f"{BASE}/fashion-shows/{season_slug}",   # existing season page
+        f"{BASE}/fashion-shows",                 # new fallback/global page
+    ]
 
-    soup = BeautifulSoup(html, "html.parser")
     links: list[str] = []
+    seen = set()
 
-    # Designer show links usually look like:
-    # /fashion-shows/<season_slug>/<designer-slug>
-    for a in soup.select(f"a[href*='/fashion-shows/{season_slug}/']"):
-        href = a.get("href")
-        if not href:
+    for source_url in sources:
+        print(f"🔭 Scanning page: {source_url}")
+        html = fetch(source_url)
+        if not html:
             continue
 
-        full = urljoin(BASE, href.split("?")[0])
+        soup = BeautifulSoup(html, "html.parser")
 
-        # Skip gallery sub-pages
-        if "/gallery" in full:
-            continue
+        for a in soup.select("a[href]"):
+            href = a.get("href")
+            if not href:
+                continue
 
-        # Keep canonical show pages: .../fashion-shows/<season>/<designer>
-        parts = full.strip("/").split("/")
-        if len(parts) >= 3 and parts[-2] == season_slug:
-            if full not in links:
-                links.append(full)
+            full = urljoin(BASE, href.split("?")[0])
+
+            # Skip gallery sub-pages
+            if "/gallery" in full:
+                continue
+
+            # Keep only show pages for this season:
+            # /fashion-shows/<season-slug>/<designer-slug>
+            prefix = f"{BASE}/fashion-shows/{season_slug}/"
+            if not full.startswith(prefix):
+                continue
+
+            parts = full.replace(BASE, "").strip("/").split("/")
+
+            # Expect: fashion-shows / <season-slug> / <designer-slug>
+            if len(parts) == 3 and parts[0] == "fashion-shows" and parts[1] == season_slug:
+                if full not in seen:
+                    seen.add(full)
+                    links.append(full)
 
     return sorted(links)
+
 
 def extract_show_data(season_slug: str, show_url: str) -> list[dict]:
     html = fetch(show_url)
