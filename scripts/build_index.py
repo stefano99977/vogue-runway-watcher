@@ -3,6 +3,7 @@ from pathlib import Path
 SITE_DIR = Path("docs")
 SEASONS_DIR = SITE_DIR / "seasons"
 
+
 def main():
     SEASONS_DIR.mkdir(parents=True, exist_ok=True)
     pages = sorted(SEASONS_DIR.glob("*.html"))
@@ -11,47 +12,62 @@ def main():
     for p in pages:
         rel = f"seasons/{p.name}"
         label = p.stem.replace("-", " ").title()
-        items.append(f'<li><a href="{rel}">{label}</a></li>')
+        items.append(f'  <li><a href="{rel}">{label}</a></li>')
 
     html = f"""<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Vogue Runway Watcher</title>
   <style>
     body {{
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      margin: 40px;
-      line-height: 1.4;
+      font-family: Arial, sans-serif;
+      margin: 32px auto;
+      max-width: 960px;
+      padding: 0 16px;
+      color: #111;
+      background: #fafafa;
     }}
-    a {{ text-decoration: none; }}
-    a:hover {{ text-decoration: underline; }}
-    .muted {{ color: #666; }}
+    h1 {{ margin-bottom: 8px; }}
+    .lead {{ color: #555; margin-bottom: 24px; }}
     .card {{
-      max-width: 900px;
+      background: #fff;
       border: 1px solid #ddd;
       border-radius: 14px;
       padding: 18px;
+      margin-bottom: 24px;
     }}
+    .starred-link {{
+      display: inline-block;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid #111;
+      text-decoration: none;
+      color: #111;
+      font-weight: 600;
+    }}
+    ul {{ line-height: 1.8; }}
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Vogue Runway Watcher</h1>
-    <p class="muted">Auto-generated galleries (one per season detected on Vogue).</p>
+  <h1>Vogue Runway Watcher</h1>
+  <p class="lead">Auto-generated galleries (one per season detected on Vogue).</p>
 
-    <h2>Seasons</h2>
-    <ul>
-      {''.join(items) if items else '<li>No seasons processed yet.</li>'}
-    </ul>
+  <div class="card">
+    <a class="starred-link" href="starred.html">⭐ Open my starred moodboard</a>
   </div>
+
+  <h2>Seasons</h2>
+  <ul>
+{''.join(items) if items else '  <li>No seasons processed yet.</li>'}
+  </ul>
 </body>
 </html>
 """
     (SITE_DIR / "index.html").write_text(html, encoding="utf-8")
-    print("✅ site/index.html updated")
+    print("✅ docs/index.html updated")
+
 
 if __name__ == "__main__":
     main()
-
