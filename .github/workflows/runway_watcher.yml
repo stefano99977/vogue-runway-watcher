@@ -1,156 +1,73 @@
-name: Vogue Runway Watcher
+from pathlib import Path
 
-on:
-  schedule:
-    # Daily at 07:00 UTC (~08:00 Madrid winter / ~09:00 summer)
-    - cron: "0 7 * * *"
-  workflow_dispatch: {}
+SITE_DIR = Path("docs")
+SEASONS_DIR = SITE_DIR / "seasons"
 
-permissions:
-  contents: write
 
-jobs:
-  watch:
-    runs-on: ubuntu-latest
+def main():
+    SEASONS_DIR.mkdir(parents=True, exist_ok=True)
+    pages = sorted(SEASONS_DIR.glob("*.html"))
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    items = []
+    for p in pages:
+        rel = f"seasons/{p.name}"
+        label = p.stem.replace("-", " ").title()
+        items.append(f'  <li><a href="{rel}">{label}</a></li>')
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+    html = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Vogue Runway Watcher</title>
+  <style>
+    body {{
+      font-family: Arial, sans-serif;
+      margin: 32px auto;
+      max-width: 960px;
+      padding: 0 16px;
+      color: #111;
+      background: #fafafa;
+    }}
+    h1 {{ margin-bottom: 8px; }}
+    .lead {{ color: #555; margin-bottom: 24px; }}
+    .card {{
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 24px;
+    }}
+    .starred-link {{
+      display: inline-block;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid #111;
+      text-decoration: none;
+      color: #111;
+      font-weight: 600;
+    }}
+    ul {{ line-height: 1.8; }}
+  </style>
+</head>
+<body>
+  <h1>Vogue Runway Watcher</h1>
+  <p class="lead">Auto-generated galleries (one per season detected on Vogue).</p>
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+  <div class="card">
+    <a class="starred-link" href="starred.html">⭐ Open my starred moodboard</a>
+  </div>
 
-      - name: Detect new shows
-        id: detect
-        run: |
-          set +e
-          python scripts/watch_seasons.py
-          code=$?
-          echo "exit_code=$code" >> $GITHUB_OUTPUT
-          exit 0
+  <h2>Seasons</h2>
+  <ul>
+{''.join(items) if items else '  <li>No seasons processed yet.</li>'}
+  </ul>
+</body>
+</html>
+"""
+    (SITE_DIR / "index.html").write_text(html, encoding="utf-8")
+    print("✅ docs/index.html updated")
 
-      # ─────────────────────────────────────────────
-      # Prepare email content (ONLY if new shows)
-      # ─────────────────────────────────────────────
-      - name: Prepare email content
-        id: email
-        if: steps.detect.outputs.exit_code == '1'
-        run: |
-          python - << 'PY' >> "$GITHUB_OUTPUT"
-          import json
-          from pathlib import Path
 
-          BASE = "https://stefano99977.github.io/vogue-runway-watcher/"
-
-          data = json.loads(Path("data/new_shows.json").read_text(encoding="utf-8"))
-          shows = data.get("new_shows", [])
-
-          files = [f"{s.replace('/', '--')}.html" for s in shows]
-          links = "\n".join([f"- {BASE}seasons/{f}" for f in files])
-
-          print(f"shows={', '.join(shows)}")
-          print(f"files={', '.join(files)}")
-          print("links<<EOF")
-          print(links)
-          print("EOF")
-          print(f"index={BASE}")
-          PY
-
-      # ─────────────────────────────────────────────
-      # Process new shows
-      # ─────────────────────────────────────────────
-      - name: Process new shows (scrape → build gallery → build index)
-        if: steps.detect.outputs.exit_code == '1'
-        run: |
-          python - << 'PY'
-          import json
-          import sys
-          import subprocess
-          from pathlib import Path
-
-          def safe_name(show_slug: str) -> str:
-              return show_slug.replace("/", "--")
-
-          def title_from_show(show_slug: str) -> str:
-              season, designer = show_slug.split("/", 1)
-              season_label = season.replace("-", " ").title()
-              designer_label = designer.replace("-", " ").title()
-              return f"Vogue {season_label} — {designer_label}"
-
-          new_file = Path("data/new_shows.json")
-          if not new_file.exists():
-              raise SystemExit("Expected data/new_shows.json but file not found.")
-
-          new = json.loads(new_file.read_text(encoding="utf-8")).get("new_shows", [])
-          if not new:
-              print("No new shows listed; nothing to do.")
-              raise SystemExit(0)
-
-          for show in new:
-              subprocess.check_call([sys.executable, "scripts/scrape_season.py", show])
-
-              name = safe_name(show)
-              csv_path = f"data/seasons/{name}.csv"
-              html_path = f"docs/seasons/{name}.html"
-              title = title_from_show(show)
-
-              subprocess.check_call([
-                  sys.executable,
-                  "scripts/build_gallery.py",
-                  csv_path,
-                  html_path,
-                  title
-              ])
-
-          subprocess.check_call([sys.executable, "scripts/build_index.py"])
-          PY
-
-      # ─────────────────────────────────────────────
-      # Commit changes
-      # ─────────────────────────────────────────────
-      - name: Commit and push changes
-        if: steps.detect.outputs.exit_code != '2'
-        run: |
-          git config user.name "runway-bot"
-          git config user.email "runway-bot@users.noreply.github.com"
-
-          git add -A
-          git commit -m "Update Vogue watcher state/output" || exit 0
-          git push
-
-      # ─────────────────────────────────────────────
-      # Email notification (ONLY after successful push)
-      # ─────────────────────────────────────────────
-      - name: Email notification – new Vogue show added
-        if: steps.detect.outputs.exit_code == '1'
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          secure: false
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          to: ${{ secrets.EMAIL_TO }}
-          from: ${{ secrets.EMAIL_FROM }}
-          subject: "🆕 New Vogue runway show published"
-          body: |
-            A new Vogue runway show has been detected and published.
-
-            Show(s):
-            ${{ steps.email.outputs.shows }}
-
-            File(s):
-            ${{ steps.email.outputs.files }}
-
-            Gallery link(s):
-            ${{ steps.email.outputs.links }}
-
-            Index:
-            ${{ steps.email.outputs.index }}
+if __name__ == "__main__":
+    main()
