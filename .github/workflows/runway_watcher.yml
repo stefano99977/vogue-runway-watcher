@@ -1,22 +1,29 @@
 name: Vogue Runway Watcher
+
 on:
   workflow_dispatch:
+
 permissions:
   contents: write
+
 jobs:
   watch:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
       - name: Detect new shows
         id: detect
         run: |
@@ -25,9 +32,7 @@ jobs:
           code=$?
           echo "exit_code=$code" >> $GITHUB_OUTPUT
           exit 0
-      # ─────────────────────────────────────────────
-      # Prepare email content (ONLY if new shows)
-      # ─────────────────────────────────────────────
+
       - name: Prepare email content
         id: email
         if: steps.detect.outputs.exit_code == '1'
@@ -35,11 +40,15 @@ jobs:
           python - << 'PY' >> "$GITHUB_OUTPUT"
           import json
           from pathlib import Path
+
           BASE = "https://stefano99977.github.io/vogue-runway-watcher/"
+
           data = json.loads(Path("data/new_shows.json").read_text(encoding="utf-8"))
           shows = data.get("new_shows", [])
+
           files = [f"{s.replace('/', '--')}.html" for s in shows]
           links = "\n".join([f"- {BASE}seasons/{f}" for f in files])
+
           print(f"shows={', '.join(shows)}")
           print(f"files={', '.join(files)}")
           print("links<<EOF")
@@ -47,62 +56,67 @@ jobs:
           print("EOF")
           print(f"index={BASE}")
           PY
-      # ─────────────────────────────────────────────
-      # Process new shows
-      # ─────────────────────────────────────────────
+
       - name: Process new shows (scrape → build gallery → build index)
         if: steps.detect.outputs.exit_code == '1'
         run: |
           python - << 'PY'
           import json
-          import sys
           import subprocess
+          import sys
           from pathlib import Path
+
           def safe_name(show_slug: str) -> str:
               return show_slug.replace("/", "--")
+
           def title_from_show(show_slug: str) -> str:
               season, designer = show_slug.split("/", 1)
               season_label = season.replace("-", " ").title()
               designer_label = designer.replace("-", " ").title()
               return f"Vogue {season_label} — {designer_label}"
+
           new_file = Path("data/new_shows.json")
           if not new_file.exists():
               raise SystemExit("Expected data/new_shows.json but file not found.")
+
           new = json.loads(new_file.read_text(encoding="utf-8")).get("new_shows", [])
           if not new:
               print("No new shows listed; nothing to do.")
               raise SystemExit(0)
+
           for show in new:
               subprocess.check_call([sys.executable, "scripts/scrape_season.py", show])
+
               name = safe_name(show)
               csv_path = f"data/seasons/{name}.csv"
               html_path = f"docs/seasons/{name}.html"
               title = title_from_show(show)
+
               subprocess.check_call([
                   sys.executable,
                   "scripts/build_gallery.py",
                   csv_path,
                   html_path,
-                  title
+                  title,
               ])
+
           subprocess.check_call([sys.executable, "scripts/build_index.py"])
           subprocess.check_call([sys.executable, "scripts/build_starred_page.py"])
           PY
-      # ─────────────────────────────────────────────
-      # Commit changes
-      # ─────────────────────────────────────────────
-        - name: Commit and push changes
+
+      - name: Commit and push changes
         if: steps.detect.outputs.exit_code != '2'
         run: |
           git config user.name "runway-bot"
           git config user.email "runway-bot@users.noreply.github.com"
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
           git add -A
           git commit -m "Update Vogue watcher state/output" || exit 0
           git pull --rebase origin main
           git push origin main
-      # ─────────────────────────────────────────────
-      # Email notification (ONLY after successful push)
-      # ─────────────────────────────────────────────
+
       - name: Email notification – new Vogue show added
         if: steps.detect.outputs.exit_code == '1'
         uses: dawidd6/action-send-mail@v3
@@ -117,11 +131,15 @@ jobs:
           subject: "🆕 New Vogue runway show published"
           body: |
             A new Vogue runway show has been detected and published.
+
             Show(s):
             ${{ steps.email.outputs.shows }}
+
             File(s):
             ${{ steps.email.outputs.files }}
+
             Gallery link(s):
             ${{ steps.email.outputs.links }}
+
             Index:
             ${{ steps.email.outputs.index }}
