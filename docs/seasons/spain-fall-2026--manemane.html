@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Vogue Spain Fall 2026 — Manemane</title>
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --panel: rgba(255,255,255,0.04);
+      --panel2: rgba(255,255,255,0.06);
+      --text: #e8eaf0;
+      --muted: #9aa3b2;
+      --border: rgba(255,255,255,0.12);
+      --border2: rgba(255,255,255,0.18);
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+      --radius: 16px;
+      --accent: #6ea8fe;
+      --accent2: #a78bfa;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 900px at 20% -10%, rgba(110,168,254,.25), transparent 60%),
+        radial-gradient(1000px 800px at 120% 10%, rgba(167,139,250,.18), transparent 55%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .app {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 22px 18px 40px;
+    }
+
+    header {
+      display: flex;
+      gap: 14px;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      margin-top: 4px;
+    }
+
+    .kpis {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 12px;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .pill strong {
+      color: var(--text);
+      font-weight: 650;
+    }
+
+    .controls {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(11,12,16,.92), rgba(11,12,16,.72));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr 0.8fr 0.7fr auto auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    @media (max-width: 980px) {
+      .controls-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .kpis {
+        justify-content: flex-start;
+      }
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    input[type="search"], select {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input[type="search"]::placeholder {
+      color: rgba(232,234,240,.55);
+    }
+
+    .btn {
+      border: 1px solid var(--border2);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, rgba(110,168,254,.25), rgba(167,139,250,.20));
+      border-color: rgba(110,168,254,.35);
+    }
+
+    .toggles {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .toggle {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      font-size: 12px;
+      user-select: none;
+    }
+
+    .toggle input {
+      accent-color: var(--accent);
+    }
+
+    .layout {
+      border-radius: var(--radius);
+      padding: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+    }
+
+    .masonry {
+      column-count: 5;
+      column-gap: 12px;
+    }
+
+    @media (max-width: 1300px) { .masonry { column-count: 4; } }
+    @media (max-width: 980px)  { .masonry { column-count: 3; } }
+    @media (max-width: 640px)  { .masonry { column-count: 2; } }
+    @media (max-width: 420px)  { .masonry { column-count: 1; } }
+
+    .card {
+      break-inside: avoid;
+      margin: 0 0 12px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      box-shadow: 0 8px 22px rgba(0,0,0,.28);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .thumb {
+      width: 100%;
+      display: block;
+      background: rgba(255,255,255,0.05);
+      min-height: 180px;
+      object-fit: cover;
+    }
+
+    .meta {
+      padding: 10px 10px 12px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .meta .top {
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .designer {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: .1px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .look {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .caption {
+      color: rgba(232,234,240,.84);
+      font-size: 12px;
+      line-height: 1.25;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .badge {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: 11px;
+      background: rgba(0,0,0,.40);
+      border: 1px solid rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: rgba(255,255,255,.90);
+    }
+
+    .actions {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .iconbtn {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,.40);
+      color: rgba(255,255,255,.90);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      user-select: none;
+      font-size: 15px;
+    }
+
+    .iconbtn[data-starred="true"] {
+      border-color: rgba(110,168,254,.55);
+      background: rgba(110,168,254,.18);
+    }
+
+    .empty {
+      display: none;
+      padding: 26px 16px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--border2);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .footerbar {
+      display: grid;
+      place-items: center;
+      padding: 18px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      gap: 8px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      z-index: 100;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(1100px, 96vw);
+      max-height: 92vh;
+      background: rgba(17,19,24,.92);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+    }
+
+    @media (max-width: 980px) {
+      .modal-card {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .modal-imgwrap {
+      background: rgba(0,0,0,.28);
+      display: grid;
+      place-items: center;
+      min-height: 320px;
+    }
+
+    .modal-img {
+      max-width: 100%;
+      max-height: 92vh;
+      object-fit: contain;
+      display: block;
+    }
+
+    .modal-side {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .modal-side h2 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .modal-nav {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .count {
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Vogue Spain Fall 2026 — Manemane</h1>
+        <div class="subtitle">
+          Generated: 2026-04-02 08:58 UTC — source: <code>spain-fall-2026--manemane.csv</code>
+        </div>
+      </div>
+      <div class="kpis">
+        <div class="pill"><strong id="kpiTotal">0</strong> total</div>
+        <div class="pill"><strong id="kpiShowing">0</strong> showing</div>
+        <div class="pill"><strong id="kpiDesigners">0</strong> designers</div>
+      </div>
+    </header>
+
+    <section class="controls">
+      <div class="controls-grid">
+        <div class="field">
+          <label for="search">Search</label>
+          <input id="search" type="search" placeholder="Search caption, designer, season...">
+        </div>
+
+        <div class="field">
+          <label for="seasonFilter">Season</label>
+          <select id="seasonFilter"></select>
+        </div>
+
+        <div class="field">
+          <label for="designerFilter">Designer</label>
+          <select id="designerFilter"></select>
+        </div>
+
+        <div class="field">
+          <label for="sortBy">Sort</label>
+          <select id="sortBy">
+            <option value="designer_look">Designer, Look</option>
+            <option value="look_asc">Look (ascending)</option>
+            <option value="designer_asc">Designer (A–Z)</option>
+            <option value="random">Random</option>
+          </select>
+        </div>
+
+        <button class="btn" id="resetBtn" type="button">Reset</button>
+        <button class="btn primary" id="exportBtn" type="button">Export filtered CSV</button>
+      </div>
+
+      <div class="toggles">
+        <label class="toggle"><input id="onlyStarred" type="checkbox"> Only starred</label>
+        <label class="toggle"><input id="autoload" type="checkbox" checked> Auto-load</label>
+        <div class="toggle">Keys: Esc close • ←/→ navigate</div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div id="emptyState" class="empty">No looks match the current filters.</div>
+      <div id="grid" class="masonry"></div>
+    </section>
+
+    <div class="footerbar">
+      <button class="btn" id="loadMoreBtn" type="button">Load more</button>
+    </div>
+  </div>
+
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-imgwrap">
+        <img id="modalImg" class="modal-img" alt="">
+      </div>
+      <div class="modal-side">
+        <button class="btn" id="closeModalBtn" type="button">✕</button>
+
+        <div>
+          <h2 id="modalTitle"></h2>
+          <div id="modalMeta" class="muted"></div>
+        </div>
+
+        <div id="modalCaption"></div>
+
+        <div class="modal-actions">
+          <a id="modalSource" class="btn" href="#" target="_blank" rel="noopener">Open source</a>
+          <a id="modalImage" class="btn" href="#" target="_blank" rel="noopener">Open image</a>
+          <button id="modalStar" class="btn" type="button">Star</button>
+        </div>
+
+        <div class="modal-nav">
+          <button class="btn" id="prevBtn" type="button">← Prev</button>
+          <div id="modalCount" class="count">0 / 0</div>
+          <button class="btn" id="nextBtn" type="button">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const LOOKS = [{"id": "spain-fall-2026--manemane__1__https://assets.vogue.com/photos/69cd258a523ccad18f068777/master/w_2560%2Cc_limit/00001-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "page_slug": "spain-fall-2026--manemane", "page_url": "seasons/spain-fall-2026--manemane.html", "season": "spain-fall-2026", "designer": "Manemane", "look_number": 1, "image_url": "https://assets.vogue.com/photos/69cd258a523ccad18f068777/master/w_2560%2Cc_limit/00001-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "caption": "Look 1", "source_url": "https://www.vogue.com/fashion-shows/spain-fall-2026/manemane"}, {"id": "spain-fall-2026--manemane__2__https://assets.vogue.com/photos/69cd258640f80b27e04ae522/master/w_2560%2Cc_limit/00002-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "page_slug": "spain-fall-2026--manemane", "page_url": "seasons/spain-fall-2026--manemane.html", "season": "spain-fall-2026", "designer": "Manemane", "look_number": 2, "image_url": "https://assets.vogue.com/photos/69cd258640f80b27e04ae522/master/w_2560%2Cc_limit/00002-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "caption": "Look 2", "source_url": "https://www.vogue.com/fashion-shows/spain-fall-2026/manemane"}, {"id": "spain-fall-2026--manemane__3__https://assets.vogue.com/photos/69cd25863fe35bf39be9fc51/master/w_2560%2Cc_limit/00003-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "page_slug": "spain-fall-2026--manemane", "page_url": "seasons/spain-fall-2026--manemane.html", "season": "spain-fall-2026", "designer": "Manemane", "look_number": 3, "image_url": "https://assets.vogue.com/photos/69cd25863fe35bf39be9fc51/master/w_2560%2Cc_limit/00003-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "caption": "Look 3", "source_url": "https://www.vogue.com/fashion-shows/spain-fall-2026/manemane"}, {"id": "spain-fall-2026--manemane__4__https://assets.vogue.com/photos/69cd258aa958011088994801/master/w_2560%2Cc_limit/00004-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "page_slug": "spain-fall-2026--manemane", "page_url": "seasons/spain-fall-2026--manemane.html", "season": "spain-fall-2026", "designer": "Manemane", "look_number": 4, "image_url": "https://assets.vogue.com/photos/69cd258aa958011088994801/master/w_2560%2Cc_limit/00004-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "caption": "Look 4", "source_url": "https://www.vogue.com/fashion-shows/spain-fall-2026/manemane"}, {"id": "spain-fall-2026--manemane__5__https://assets.vogue.com/photos/69cd258a15f0781079750dd3/master/w_2560%2Cc_limit/00005-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "page_slug": "spain-fall-2026--manemane", "page_url": "seasons/spain-fall-2026--manemane.html", "season": "spain-fall-2026", "designer": "Manemane", "look_number": 5, "image_url": "https://assets.vogue.com/photos/69cd258a15f0781079750dd3/master/w_2560%2Cc_limit/00005-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "caption": "Look 5", "source_url": "https://www.vogue.com/fashion-shows/spain-fall-2026/manemane"}, {"id": "spain-fall-2026--manemane__6__https://assets.vogue.com/photos/69cd25901b60ab108eef464b/master/w_2560%2Cc_limit/00006-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "page_slug": "spain-fall-2026--manemane", "page_url": "seasons/spain-fall-2026--manemane.html", "season": "spain-fall-2026", "designer": "Manemane", "look_number": 6, "image_url": "https://assets.vogue.com/photos/69cd25901b60ab108eef464b/master/w_2560%2Cc_limit/00006-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "caption": "Look 6", "source_url": "https://www.vogue.com/fashion-shows/spain-fall-2026/manemane"}, {"id": "spain-fall-2026--manemane__7__https://assets.vogue.com/photos/69cd252d5e09ed7a08d63b3a/master/w_1280%2Cc_limit/00001-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "page_slug": "spain-fall-2026--manemane", "page_url": "seasons/spain-fall-2026--manemane.html", "season": "spain-fall-2026", "designer": "Manemane", "look_number": 7, "image_url": "https://assets.vogue.com/photos/69cd252d5e09ed7a08d63b3a/master/w_1280%2Cc_limit/00001-manemane-fall-2026-ready-to-wear-spain-credit-brand.jpg", "caption": "Spain Fall 2026", "source_url": "https://www.vogue.com/fashion-shows/spain-fall-2026/manemane"}, {"id": "spain-fall-2026--manemane__8__https://assets.vogue.com/photos/69008d07c26969f499d3ef6a/master/w_1280%2Cc_limit/00001-manemane-spring-2026-ready-to-wear-spain-credit-brand.jpg", "page_slug": "spain-fall-2026--manemane", "page_url": "seasons/spain-fall-2026--manemane.html", "season": "spain-fall-2026", "designer": "Manemane", "look_number": 8, "image_url": "https://assets.vogue.com/photos/69008d07c26969f499d3ef6a/master/w_1280%2Cc_limit/00001-manemane-spring-2026-ready-to-wear-spain-credit-brand.jpg", "caption": "Spain Spring 2026", "source_url": "https://www.vogue.com/fashion-shows/spain-fall-2026/manemane"}, {"id": "spain-fall-2026--manemane__9__https://assets.vogue.com/photos/682b3c26d1a068291e6d1f54/master/w_1280%2Cc_limit/00001-manemane-fall-2025-ready-to-wear-spain-credit-brand.jpg", "page_slug": "spain-fall-2026--manemane", "page_url": "seasons/spain-fall-2026--manemane.html", "season": "spain-fall-2026", "designer": "Manemane", "look_number": 9, "image_url": "https://assets.vogue.com/photos/682b3c26d1a068291e6d1f54/master/w_1280%2Cc_limit/00001-manemane-fall-2025-ready-to-wear-spain-credit-brand.jpg", "caption": "Spain Fall 2025", "source_url": "https://www.vogue.com/fashion-shows/spain-fall-2026/manemane"}, {"id": "spain-fall-2026--manemane__10__https://assets.vogue.com/photos/672c86f5d4e417f5398fe886/master/w_1280%2Cc_limit/00001-manemane-spring-2025-ready-to-wear-credit-brand.jpg", "page_slug": "spain-fall-2026--manemane", "page_url": "seasons/spain-fall-2026--manemane.html", "season": "spain-fall-2026", "designer": "Manemane", "look_number": 10, "image_url": "https://assets.vogue.com/photos/672c86f5d4e417f5398fe886/master/w_1280%2Cc_limit/00001-manemane-spring-2025-ready-to-wear-credit-brand.jpg", "caption": "Spain Spring 2025", "source_url": "https://www.vogue.com/fashion-shows/spain-fall-2026/manemane"}, {"id": "spain-fall-2026--manemane__11__https://assets.vogue.com/photos/63345c2478b8d831eb224e28/master/w_1280%2Cc_limit/00001-mane-mane-spring-2023-ready-to-wear-credit-felipe-orellana-fuentealba.jpg", "page_slug": "spain-fall-2026--manemane", "page_url": "seasons/spain-fall-2026--manemane.html", "season": "spain-fall-2026", "designer": "Manemane", "look_number": 11, "image_url": "https://assets.vogue.com/photos/63345c2478b8d831eb224e28/master/w_1280%2Cc_limit/00001-mane-mane-spring-2023-ready-to-wear-credit-felipe-orellana-fuentealba.jpg", "caption": "Madrid Spring 2023", "source_url": "https://www.vogue.com/fashion-shows/spain-fall-2026/manemane"}, {"id": "spain-fall-2026--manemane__12__https://assets.vogue.com/photos/623b005956feea2652758c03/master/w_1280%2Cc_limit/00001-mane-mane-madrid-fall-2022-ready-to-wear-credit-enanei-and-sergio-penas.jpg", "page_slug": "spain-fall-2026--manemane", "page_url": "seasons/spain-fall-2026--manemane.html", "season": "spain-fall-2026", "designer": "Manemane", "look_number": 12, "image_url": "https://assets.vogue.com/photos/623b005956feea2652758c03/master/w_1280%2Cc_limit/00001-mane-mane-madrid-fall-2022-ready-to-wear-credit-enanei-and-sergio-penas.jpg", "caption": "Madrid Fall 2022", "source_url": "https://www.vogue.com/fashion-shows/spain-fall-2026/manemane"}];
+    const STAR_KEY = "vogue_starred__spain-fall-2026--manemane";
+    const PAGE_TITLE = "Vogue Spain Fall 2026 — Manemane";
+
+    const PAGE_SIZE = 40;
+
+    let filtered = [];
+    let renderedCount = 0;
+    let modalIndex = -1;
+
+    const els = {
+      search: document.getElementById("search"),
+      seasonFilter: document.getElementById("seasonFilter"),
+      designerFilter: document.getElementById("designerFilter"),
+      sortBy: document.getElementById("sortBy"),
+      resetBtn: document.getElementById("resetBtn"),
+      exportBtn: document.getElementById("exportBtn"),
+      onlyStarred: document.getElementById("onlyStarred"),
+      autoload: document.getElementById("autoload"),
+      grid: document.getElementById("grid"),
+      emptyState: document.getElementById("emptyState"),
+      loadMoreBtn: document.getElementById("loadMoreBtn"),
+      kpiTotal: document.getElementById("kpiTotal"),
+      kpiShowing: document.getElementById("kpiShowing"),
+      kpiDesigners: document.getElementById("kpiDesigners"),
+      modal: document.getElementById("modal"),
+      modalImg: document.getElementById("modalImg"),
+      modalTitle: document.getElementById("modalTitle"),
+      modalMeta: document.getElementById("modalMeta"),
+      modalCaption: document.getElementById("modalCaption"),
+      modalSource: document.getElementById("modalSource"),
+      modalImage: document.getElementById("modalImage"),
+      modalStar: document.getElementById("modalStar"),
+      modalCount: document.getElementById("modalCount"),
+      closeModalBtn: document.getElementById("closeModalBtn"),
+      prevBtn: document.getElementById("prevBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+    };
+
+    function text(v) {
+      return (v ?? "").toString();
+    }
+
+    function normalize(v) {
+      return text(v).trim().toLowerCase();
+    }
+
+    function lookNumberForSort(item) {
+      const n = Number(item.look_number);
+      return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
+    }
+
+    function uniqSorted(values) {
+      return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    }
+
+    function shuffle(arr) {
+      const out = [...arr];
+      for (let i = out.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [out[i], out[j]] = [out[j], out[i]];
+      }
+      return out;
+    }
+
+    function csvEscape(v) {
+      const s = text(v);
+      if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+      return s;
+    }
+
+    function getStarred() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(STAR_KEY) || "[]");
+        return Array.isArray(raw) ? raw : [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function saveStarred(items) {
+      localStorage.setItem(STAR_KEY, JSON.stringify(items));
+    }
+
+    function isStarred(item) {
+      return getStarred().some(x => x.id === item.id);
+    }
+
+    function toggleStar(item) {
+      const starred = getStarred();
+      const exists = starred.some(x => x.id === item.id);
+
+      let updated;
+      if (exists) {
+        updated = starred.filter(x => x.id !== item.id);
+      } else {
+        updated = [...starred, item];
+      }
+
+      saveStarred(updated);
+      render(true);
+
+      if (modalIndex >= 0) {
+        renderModal();
+      }
+    }
+
+    function populateFilters() {
+      const seasons = uniqSorted(LOOKS.map(x => text(x.season)));
+      const designers = uniqSorted(LOOKS.map(x => text(x.designer)));
+
+      els.seasonFilter.innerHTML = '<option value="">All seasons</option>' +
+        seasons.map(v => `<option value="${htm(v)}">${htm(v)}</option>`).join("");
+
+      els.designerFilter.innerHTML = '<option value="">All designers</option>' +
+        designers.map(v => `<option value="${htm(v)}">${htm(v)}</option>`).join("");
+    }
+
+    function htm(v) {
+      return text(v)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function applyFilters() {
+      const q = normalize(els.search.value);
+      const season = normalize(els.seasonFilter.value);
+      const designer = normalize(els.designerFilter.value);
+      const onlyStarred = els.onlyStarred.checked;
+      const sortBy = els.sortBy.value;
+
+      let items = LOOKS.filter(item => {
+        if (season && normalize(item.season) !== season) return false;
+        if (designer && normalize(item.designer) !== designer) return false;
+        if (onlyStarred && !isStarred(item)) return false;
+
+        if (q) {
+          const haystack = [
+            item.season,
+            item.designer,
+            item.look_number,
+            item.caption,
+            item.source_url,
+          ].map(text).join(" ").toLowerCase();
+
+          if (!haystack.includes(q)) return false;
+        }
+
+        return true;
+      });
+
+      if (sortBy === "look_asc") {
+        items.sort((a, b) => lookNumberForSort(a) - lookNumberForSort(b));
+      } else if (sortBy === "designer_asc") {
+        items.sort((a, b) =>
+          text(a.designer).localeCompare(text(b.designer)) ||
+          lookNumberForSort(a) - lookNumberForSort(b)
+        );
+      } else if (sortBy === "random") {
+        items = shuffle(items);
+      } else {
+        items.sort((a, b) =>
+          text(a.designer).localeCompare(text(b.designer)) ||
+          lookNumberForSort(a) - lookNumberForSort(b)
+        );
+      }
+
+      return items;
+    }
+
+    function updateKpis(showingCount, items) {
+      els.kpiTotal.textContent = LOOKS.length;
+      els.kpiShowing.textContent = showingCount;
+      els.kpiDesigners.textContent = new Set(items.map(x => text(x.designer)).filter(Boolean)).size;
+    }
+
+    function buildCard(item, absoluteIndex) {
+      const card = document.createElement("article");
+      card.className = "card";
+
+      const starred = isStarred(item);
+
+      card.innerHTML = `
+        <div class="badge">${htm(text(item.season) || "—")}</div>
+        <div class="actions">
+          <button class="iconbtn starbtn" type="button" title="Star" aria-label="Star" data-starred="${starred ? "true" : "false"}">★</button>
+        </div>
+        <img class="thumb" loading="lazy" src="${htm(text(item.image_url))}" alt="${htm(text(item.caption) || text(item.designer) || "Look image")}">
+        <div class="meta">
+          <div class="top">
+            <div class="designer">${htm(text(item.designer) || "Unknown designer")}</div>
+            <div class="look">Look ${htm(text(item.look_number) || "—")}</div>
+          </div>
+          <div class="caption">${htm(text(item.caption) || "No caption")}</div>
+        </div>
+      `;
+
+      card.addEventListener("click", () => openModal(absoluteIndex));
+
+      const starBtn = card.querySelector(".starbtn");
+      starBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleStar(item);
+      });
+
+      return card;
+    }
+
+    function render(resetCount = false) {
+      filtered = applyFilters();
+
+      if (resetCount) {
+        renderedCount = 0;
+      }
+      if (renderedCount === 0) {
+        els.grid.innerHTML = "";
+      }
+
+      if (!els.autoload.checked) {
+        renderedCount = Math.min(PAGE_SIZE, filtered.length);
+      } else {
+        renderedCount = resetCount ? Math.min(PAGE_SIZE, filtered.length) : Math.max(renderedCount, Math.min(PAGE_SIZE, filtered.length));
+      }
+
+      const toRender = filtered.slice(0, renderedCount);
+      els.grid.innerHTML = "";
+      toRender.forEach((item, idx) => {
+        els.grid.appendChild(buildCard(item, idx));
+      });
+
+      els.emptyState.style.display = filtered.length ? "none" : "block";
+      els.loadMoreBtn.style.display = renderedCount < filtered.length ? "inline-block" : "none";
+
+      updateKpis(toRender.length, filtered);
+    }
+
+    function loadMore() {
+      renderedCount = Math.min(renderedCount + PAGE_SIZE, filtered.length);
+      render(false);
+    }
+
+    function openModal(index) {
+      modalIndex = index;
+      renderModal();
+      els.modal.classList.add("open");
+      els.modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeModal() {
+      els.modal.classList.remove("open");
+      els.modal.setAttribute("aria-hidden", "true");
+      modalIndex = -1;
+    }
+
+    function renderModal() {
+      if (modalIndex < 0 || modalIndex >= filtered.length) return;
+
+      const item = filtered[modalIndex];
+      els.modalImg.src = text(item.image_url);
+      els.modalImg.alt = text(item.caption) || text(item.designer) || "Look image";
+      els.modalTitle.textContent = text(item.designer) || "Unknown designer";
+      els.modalMeta.textContent = `${text(item.season) || "—"} · Look ${text(item.look_number) || "—"}`;
+      els.modalCaption.textContent = text(item.caption) || "No caption";
+      els.modalSource.href = text(item.source_url) || "#";
+      els.modalImage.href = text(item.image_url) || "#";
+      els.modalCount.textContent = `${modalIndex + 1} / ${filtered.length}`;
+      els.modalStar.textContent = isStarred(item) ? "Unstar" : "Star";
+
+      els.modalStar.onclick = () => toggleStar(item);
+      els.prevBtn.disabled = modalIndex <= 0;
+      els.nextBtn.disabled = modalIndex >= filtered.length - 1;
+    }
+
+    function exportFilteredCsv() {
+      const rows = [
+        ["season", "designer", "look_number", "image_url", "caption", "source_url"],
+        ...filtered.map(item => [
+          text(item.season),
+          text(item.designer),
+          text(item.look_number),
+          text(item.image_url),
+          text(item.caption),
+          text(item.source_url),
+        ])
+      ];
+
+      const csv = rows.map(row => row.map(csvEscape).join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${PAGE_TITLE.replace(/[^a-z0-9_-]+/gi, "_").toLowerCase()}_filtered.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function resetControls() {
+      els.search.value = "";
+      els.seasonFilter.value = "";
+      els.designerFilter.value = "";
+      els.sortBy.value = "designer_look";
+      els.onlyStarred.checked = false;
+      renderedCount = 0;
+      render(true);
+    }
+
+    els.search.addEventListener("input", () => {
+      renderedCount = 0;
+      render(true);
+    });
+    els.seasonFilter.addEventListener("change", () => {
+      renderedCount = 0;
+      render(true);
+    });
+    els.designerFilter.addEventListener("change", () => {
+      renderedCount = 0;
+      render(true);
+    });
+    els.sortBy.addEventListener("change", () => {
+      renderedCount = 0;
+      render(true);
+    });
+    els.onlyStarred.addEventListener("change", () => {
+      renderedCount = 0;
+      render(true);
+    });
+    els.resetBtn.addEventListener("click", resetControls);
+    els.exportBtn.addEventListener("click", exportFilteredCsv);
+    els.loadMoreBtn.addEventListener("click", loadMore);
+
+    els.closeModalBtn.addEventListener("click", closeModal);
+    els.modal.addEventListener("click", (e) => {
+      if (e.target === els.modal) closeModal();
+    });
+    els.prevBtn.addEventListener("click", () => {
+      if (modalIndex > 0) {
+        modalIndex -= 1;
+        renderModal();
+      }
+    });
+    els.nextBtn.addEventListener("click", () => {
+      if (modalIndex < filtered.length - 1) {
+        modalIndex += 1;
+        renderModal();
+      }
+    });
+
+    window.addEventListener("storage", (e) => {
+      if (e.key === STAR_KEY) {
+        render(true);
+      }
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && els.modal.classList.contains("open")) {
+        closeModal();
+      } else if (e.key === "ArrowLeft" && els.modal.classList.contains("open") && modalIndex > 0) {
+        modalIndex -= 1;
+        renderModal();
+      } else if (e.key === "ArrowRight" && els.modal.classList.contains("open") && modalIndex < filtered.length - 1) {
+        modalIndex += 1;
+        renderModal();
+      }
+    });
+
+    populateFilters();
+    renderedCount = Math.min(PAGE_SIZE, LOOKS.length);
+    render(true);
+  </script>
+</body>
+</html>

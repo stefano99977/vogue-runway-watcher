@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Starred Looks</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --card: #ffffff;
+      --text: #111111;
+      --muted: #666666;
+      --border: #dddddd;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .topbar a {
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 10px 14px;
+      border-radius: 10px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+    .sub {
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .toolbar input {
+      min-width: 260px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .toolbar button {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .meta {
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .img-wrap {
+      display: block;
+      background: #eee;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+    }
+    .img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .body {
+      padding: 12px;
+    }
+    .title {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .line {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .actions a,
+    .actions button {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .empty {
+      display: none;
+      color: var(--muted);
+      padding: 18px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a href="./index.html">← Back to main page</a>
+    </div>
+
+    <h1>⭐ Starred Looks</h1>
+    <div class="sub">A single moodboard with every look you starred across all gallery pages.</div>
+
+    <div class="toolbar">
+      <input id="search" type="text" placeholder="Search season, designer, caption...">
+      <button id="clearBtn" type="button">Clear</button>
+    </div>
+
+    <div id="meta" class="meta">0 starred looks</div>
+    <div id="empty" class="empty">No starred looks yet.</div>
+    <div id="grid" class="grid"></div>
+  </div>
+
+  <script>
+    const STAR_PREFIX = "vogue_starred__";
+
+    function safeText(v) {
+      return (v ?? "").toString();
+    }
+
+    function itemId(item) {
+      return safeText(item.id) ||
+             [
+               safeText(item.page_slug),
+               safeText(item.look_number),
+               safeText(item.image_url)
+             ].join("__");
+    }
+
+    function getAllStarred() {
+      const all = [];
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key || !key.startsWith(STAR_PREFIX)) continue;
+
+        try {
+          const raw = JSON.parse(localStorage.getItem(key) || "[]");
+          if (!Array.isArray(raw)) continue;
+
+          for (const item of raw) {
+            if (item && typeof item === "object") {
+              all.push(item);
+            }
+          }
+        } catch (err) {
+          console.warn("Could not parse starred key:", key, err);
+        }
+      }
+
+      const seen = new Set();
+      return all.filter((item) => {
+        const id = itemId(item);
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      });
+    }
+
+    function storageKeyFor(item) {
+      if (item.page_slug) return STAR_PREFIX + item.page_slug;
+      return null;
+    }
+
+    function removeStar(item) {
+      const key = storageKeyFor(item);
+      if (!key) return;
+
+      let raw = [];
+      try {
+        raw = JSON.parse(localStorage.getItem(key) || "[]");
+      } catch (_) {
+        raw = [];
+      }
+
+      const targetId = itemId(item);
+      const updated = raw.filter((x) => itemId(x) !== targetId);
+      localStorage.setItem(key, JSON.stringify(updated));
+      render();
+    }
+
+    function buildPageUrl(item) {
+      if (item.page_url) return item.page_url;
+      if (item.page_slug) return `seasons/${item.page_slug}.html`;
+      return "#";
+    }
+
+    function matchesQuery(item, q) {
+      if (!q) return true;
+      const haystack = [
+        item.season,
+        item.designer,
+        item.caption,
+        item.look_number,
+        item.page_slug
+      ].map(safeText).join(" ").toLowerCase();
+
+      return haystack.includes(q);
+    }
+
+    function render() {
+      const q = document.getElementById("search").value.trim().toLowerCase();
+      const items = getAllStarred().filter(item => matchesQuery(item, q));
+      const grid = document.getElementById("grid");
+      const meta = document.getElementById("meta");
+      const empty = document.getElementById("empty");
+
+      meta.textContent = `${items.length} starred look${items.length === 1 ? "" : "s"}`;
+      grid.innerHTML = "";
+
+      if (!items.length) {
+        empty.style.display = "block";
+        return;
+      }
+
+      empty.style.display = "none";
+
+      for (const item of items) {
+        const card = document.createElement("article");
+        card.className = "card";
+
+        const img = safeText(item.image_url);
+        const pageUrl = buildPageUrl(item);
+        const title = safeText(item.designer) || "Unknown designer";
+        const season = safeText(item.season);
+        const look = safeText(item.look_number);
+        const caption = safeText(item.caption);
+        const sourceUrl = safeText(item.source_url);
+
+        card.innerHTML = `
+          <a class="img-wrap" href="${pageUrl}">
+            <img src="${img}" alt="${caption || title}">
+          </a>
+          <div class="body">
+            <div class="title">${title}</div>
+            <div class="line">${season}</div>
+            <div class="line">Look ${look || "—"}</div>
+            ${caption ? `<div class="line">${caption}</div>` : ""}
+            <div class="actions">
+              <a href="${pageUrl}">Open gallery</a>
+              ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener">Source</a>` : ""}
+              <button type="button" data-remove="${itemId(item)}">Unstar</button>
+            </div>
+          </div>
+        `;
+
+        const btn = card.querySelector("button[data-remove]");
+        btn.addEventListener("click", () => removeStar(item));
+
+        grid.appendChild(card);
+      }
+    }
+
+    document.getElementById("search").addEventListener("input", render);
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      document.getElementById("search").value = "";
+      render();
+    });
+
+    window.addEventListener("storage", render);
+    render();
+  </script>
+</body>
+</html>
