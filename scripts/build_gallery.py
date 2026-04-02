@@ -1,80 +1,183 @@
-import json
-import html as htmllib
-import re
+import csv
 import datetime
+import html as htmllib
+import json
+import re
 from pathlib import Path
 
 import pandas as pd
 
 TEMPLATE_STAR_KEY_PREFIX = "vogue_starred__"
 
+
+def js_string(value: str) -> str:
+    return json.dumps(value, ensure_ascii=False)
+
+
 def build_gallery(csv_path: Path, out_path: Path, title: str) -> None:
     df = pd.read_csv(csv_path).fillna("")
+
+    page_slug = re.sub(r"[^a-zA-Z0-9_-]+", "_", out_path.stem)
+    page_url = f"seasons/{out_path.name}"
+
     data = []
     for _, r in df.iterrows():
-        look = str(r.get("look_number", ""))
+        look = str(r.get("look_number", "")).strip()
         look_number = int(look) if look.isdigit() else look
 
-        data.append({
-            "season": str(r.get("season", "")),
-            "designer": str(r.get("designer", "")),
+        item = {
+            "id": f"{page_slug}__{look_number}__{str(r.get('image_url', '')).strip()}",
+            "page_slug": page_slug,
+            "page_url": page_url,
+            "season": str(r.get("season", "")).strip(),
+            "designer": str(r.get("designer", "")).strip(),
             "look_number": look_number,
-            "image_url": str(r.get("image_url", "")),
-            "caption": str(r.get("caption", "")),
-            "source_url": str(r.get("source_url", "")),
-        })
+            "image_url": str(r.get("image_url", "")).strip(),
+            "caption": str(r.get("caption", "")).strip(),
+            "source_url": str(r.get("source_url", "")).strip(),
+        }
+        data.append(item)
 
     generated = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
-    star_key = TEMPLATE_STAR_KEY_PREFIX + re.sub(r"[^a-zA-Z0-9_-]+", "_", out_path.stem)
+    star_key = TEMPLATE_STAR_KEY_PREFIX + page_slug
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     html_out = f"""<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>{htmllib.escape(title)}</title>
   <style>
     :root {{
       --bg: #0b0c10;
-      --panel: #111318;
+      --panel: rgba(255,255,255,0.04);
+      --panel2: rgba(255,255,255,0.06);
       --text: #e8eaf0;
-      --muted: #a8afc2;
-      --border: rgba(255,255,255,0.10);
-      --border2: rgba(255,255,255,0.16);
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --muted: #9aa3b2;
+      --border: rgba(255,255,255,0.12);
+      --border2: rgba(255,255,255,0.18);
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
       --radius: 16px;
       --accent: #6ea8fe;
+      --accent2: #a78bfa;
     }}
+
     * {{ box-sizing: border-box; }}
+
     body {{
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: radial-gradient(1200px 900px at 20% -10%, rgba(110,168,254,.25), transparent 60%),
-                  radial-gradient(1000px 800px at 120% 10%, rgba(167,139,250,.18), transparent 55%),
-                  var(--bg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 900px at 20% -10%, rgba(110,168,254,.25), transparent 60%),
+        radial-gradient(1000px 800px at 120% 10%, rgba(167,139,250,.18), transparent 55%),
+        var(--bg);
       color: var(--text);
     }}
-    .app {{ max-width: 1400px; margin: 0 auto; padding: 22px 18px 40px; }}
-    header {{ display:flex; gap:14px; align-items:flex-end; justify-content:space-between; margin-bottom:14px; }}
-    h1 {{ font-size:22px; margin:0; font-weight:700; }}
-    .subtitle {{ color:var(--muted); font-size:13px; line-height:1.3; }}
-    .kpis {{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }}
-    .pill {{ background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--muted);
-      border-radius: 999px; padding: 8px 10px; font-size: 12px; display: inline-flex; gap: 8px; align-items: center; white-space: nowrap; }}
-    .pill strong {{ color: var(--text); font-weight: 650; }}
-    .controls {{
-      position: sticky; top: 0; z-index: 50;
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      background: linear-gradient(to bottom, rgba(11,12,16,.92), rgba(11,12,16,.72));
-      border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 12px; box-shadow: var(--shadow); margin-bottom: 16px;
+
+    a {{
+      color: inherit;
+      text-decoration: none;
     }}
-    .controls-grid {{ display:grid; grid-template-columns: 1.4fr 0.8fr 0.8fr 0.7fr auto auto; gap:10px; align-items:center; }}
-    @media (max-width: 980px) {{ .controls-grid {{ grid-template-columns: 1fr 1fr; }} header {{ flex-direction: column; align-items: flex-start; }} .kpis {{ justify-content:flex-start; }} }}
-    .field {{ display:grid; gap:6px; }}
-    label {{ font-size: 12px; color: var(--muted); }}
+
+    .app {{
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 22px 18px 40px;
+    }}
+
+    header {{
+      display: flex;
+      gap: 14px;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }}
+
+    h1 {{
+      font-size: 22px;
+      margin: 0;
+      font-weight: 700;
+    }}
+
+    .subtitle {{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      margin-top: 4px;
+    }}
+
+    .kpis {{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }}
+
+    .pill {{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 12px;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      white-space: nowrap;
+    }}
+
+    .pill strong {{
+      color: var(--text);
+      font-weight: 650;
+    }}
+
+    .controls {{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(11,12,16,.92), rgba(11,12,16,.72));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }}
+
+    .controls-grid {{
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr 0.8fr 0.7fr auto auto;
+      gap: 10px;
+      align-items: end;
+    }}
+
+    @media (max-width: 980px) {{
+      .controls-grid {{
+        grid-template-columns: 1fr 1fr;
+      }}
+      header {{
+        flex-direction: column;
+        align-items: flex-start;
+      }}
+      .kpis {{
+        justify-content: flex-start;
+      }}
+    }}
+
+    .field {{
+      display: grid;
+      gap: 6px;
+    }}
+
+    label {{
+      font-size: 12px;
+      color: var(--muted);
+    }}
+
     input[type="search"], select {{
       width: 100%;
       background: rgba(255,255,255,0.05);
@@ -85,7 +188,11 @@ def build_gallery(csv_path: Path, out_path: Path, title: str) -> None:
       font-size: 14px;
       outline: none;
     }}
-    input[type="search"]::placeholder {{ color: rgba(232,234,240,.55); }}
+
+    input[type="search"]::placeholder {{
+      color: rgba(232,234,240,.55);
+    }}
+
     .btn {{
       border: 1px solid var(--border2);
       background: rgba(255,255,255,0.05);
@@ -97,46 +204,254 @@ def build_gallery(csv_path: Path, out_path: Path, title: str) -> None:
       user-select: none;
       white-space: nowrap;
     }}
-    .btn.primary {{ background: linear-gradient(135deg, rgba(110,168,254,.25), rgba(167,139,250,.20)); border-color: rgba(110,168,254,.35); }}
-    .toggles {{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }}
-    .toggle {{ display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border-radius:999px; border:1px solid var(--border);
-      background: rgba(255,255,255,0.05); color: var(--muted); font-size: 12px; user-select: none; }}
-    .toggle input {{ accent-color: var(--accent); }}
-    .layout {{ border-radius: var(--radius); padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); }}
-    .masonry {{ column-count: 5; column-gap: 12px; }}
+
+    .btn.primary {{
+      background: linear-gradient(135deg, rgba(110,168,254,.25), rgba(167,139,250,.20));
+      border-color: rgba(110,168,254,.35);
+    }}
+
+    .toggles {{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }}
+
+    .toggle {{
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      font-size: 12px;
+      user-select: none;
+    }}
+
+    .toggle input {{
+      accent-color: var(--accent);
+    }}
+
+    .layout {{
+      border-radius: var(--radius);
+      padding: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+    }}
+
+    .masonry {{
+      column-count: 5;
+      column-gap: 12px;
+    }}
+
     @media (max-width: 1300px) {{ .masonry {{ column-count: 4; }} }}
     @media (max-width: 980px)  {{ .masonry {{ column-count: 3; }} }}
     @media (max-width: 640px)  {{ .masonry {{ column-count: 2; }} }}
     @media (max-width: 420px)  {{ .masonry {{ column-count: 1; }} }}
-    .card {{ break-inside: avoid; margin: 0 0 12px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03); box-shadow: 0 8px 22px rgba(0,0,0,.28); position: relative; cursor: pointer; }}
-    .thumb {{ width: 100%; display: block; background: rgba(255,255,255,0.05); min-height: 180px; object-fit: cover; }}
-    .meta {{ padding: 10px 10px 12px; display: grid; gap: 4px; }}
-    .meta .top {{ display:flex; gap:8px; align-items:baseline; justify-content:space-between; }}
-    .designer {{ font-size: 13px; font-weight: 650; letter-spacing: .1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }}
-    .look {{ font-size: 12px; color: var(--muted); white-space: nowrap; }}
-    .caption {{ color: rgba(232,234,240,.84); font-size: 12px; line-height: 1.25; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }}
-    .badge {{ position:absolute; left:10px; top:10px; border-radius:999px; padding:6px 9px; font-size:11px; background: rgba(0,0,0,.40);
-      border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: rgba(255,255,255,.90); }}
-    .actions {{ position:absolute; right:10px; top:10px; display:flex; gap:8px; }}
-    .iconbtn {{ width:32px; height:32px; border-radius:999px; border:1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,.40);
-      color: rgba(255,255,255,.90); display:grid; place-items:center; cursor:pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); user-select:none; }}
-    .iconbtn[data-starred="true"] {{ border-color: rgba(110,168,254,.55); background: rgba(110,168,254,.18); }}
-    .footerbar {{ display:grid; place-items:center; padding: 18px 0 0; color: var(--muted); font-size: 12px; gap: 8px; }}
-    .modal {{ position: fixed; inset: 0; background: rgba(0,0,0,.72); display:none; align-items:center; justify-content:center; padding:22px; z-index: 100; }}
-    .modal.open {{ display:flex; }}
-    .modal-card {{ width: min(1100px, 96vw); max-height: 92vh; background: rgba(17,19,24,.92); border: 1px solid rgba(255,255,255,0.16);
-      border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); display:grid; grid-template-columns: 1.7fr 1fr; }}
-    @media (max-width: 980px) {{ .modal-card {{ grid-template-columns: 1fr; }} }}
-    .modal-imgwrap {{ background: rgba(0,0,0,.28); display:grid; place-items:center; min-height: 320px; }}
-    .modal-img {{ width: 100%; height: 100%; max-height: 92vh; object-fit: contain; display:block; }}
-    .modal-side {{ padding: 14px; display:grid; gap:10px; align-content:start; border-left: 1px solid rgba(255,255,255,0.10); }}
-    @media (max-width: 980px) {{ .modal-side {{ border-left:none; border-top: 1px solid rgba(255,255,255,0.10); }} }}
-    .modal-close {{ position:absolute; right:18px; top:18px; width:40px; height:40px; border-radius:999px; border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(17,19,24,.65); color: rgba(255,255,255,.92); display:grid; place-items:center; cursor:pointer; user-select:none; }}
-    .hint {{ color: var(--muted); font-size: 12px; }}
-    .kbd {{ border: 1px solid rgba(255,255,255,0.18); border-bottom-color: rgba(255,255,255,0.26); background: rgba(255,255,255,0.06);
-      border-radius: 8px; padding: 2px 6px; font-size: 11px; color: rgba(232,234,240,.85); }}
+
+    .card {{
+      break-inside: avoid;
+      margin: 0 0 12px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      box-shadow: 0 8px 22px rgba(0,0,0,.28);
+      position: relative;
+      cursor: pointer;
+    }}
+
+    .thumb {{
+      width: 100%;
+      display: block;
+      background: rgba(255,255,255,0.05);
+      min-height: 180px;
+      object-fit: cover;
+    }}
+
+    .meta {{
+      padding: 10px 10px 12px;
+      display: grid;
+      gap: 4px;
+    }}
+
+    .meta .top {{
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      justify-content: space-between;
+    }}
+
+    .designer {{
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: .1px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }}
+
+    .look {{
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }}
+
+    .caption {{
+      color: rgba(232,234,240,.84);
+      font-size: 12px;
+      line-height: 1.25;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }}
+
+    .badge {{
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: 11px;
+      background: rgba(0,0,0,.40);
+      border: 1px solid rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: rgba(255,255,255,.90);
+    }}
+
+    .actions {{
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      display: flex;
+      gap: 8px;
+    }}
+
+    .iconbtn {{
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,.40);
+      color: rgba(255,255,255,.90);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      user-select: none;
+      font-size: 15px;
+    }}
+
+    .iconbtn[data-starred="true"] {{
+      border-color: rgba(110,168,254,.55);
+      background: rgba(110,168,254,.18);
+    }}
+
+    .empty {{
+      display: none;
+      padding: 26px 16px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--border2);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.02);
+    }}
+
+    .footerbar {{
+      display: grid;
+      place-items: center;
+      padding: 18px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      gap: 8px;
+    }}
+
+    .modal {{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      z-index: 100;
+    }}
+
+    .modal.open {{
+      display: flex;
+    }}
+
+    .modal-card {{
+      width: min(1100px, 96vw);
+      max-height: 92vh;
+      background: rgba(17,19,24,.92);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+    }}
+
+    @media (max-width: 980px) {{
+      .modal-card {{
+        grid-template-columns: 1fr;
+      }}
+    }}
+
+    .modal-imgwrap {{
+      background: rgba(0,0,0,.28);
+      display: grid;
+      place-items: center;
+      min-height: 320px;
+    }}
+
+    .modal-img {{
+      max-width: 100%;
+      max-height: 92vh;
+      object-fit: contain;
+      display: block;
+    }}
+
+    .modal-side {{
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }}
+
+    .modal-side h2 {{
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.2;
+    }}
+
+    .muted {{
+      color: var(--muted);
+    }}
+
+    .modal-actions {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }}
+
+    .modal-nav {{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }}
+
+    .count {{
+      color: var(--muted);
+      font-size: 13px;
+    }}
   </style>
 </head>
 <body>
@@ -145,12 +460,12 @@ def build_gallery(csv_path: Path, out_path: Path, title: str) -> None:
       <div>
         <h1>{htmllib.escape(title)}</h1>
         <div class="subtitle">
-          Generated: <strong>{htmllib.escape(generated)}</strong> — source: <code>{htmllib.escape(csv_path.name)}</code>
+          Generated: {htmllib.escape(generated)} — source: <code>{htmllib.escape(csv_path.name)}</code>
         </div>
       </div>
       <div class="kpis">
         <div class="pill"><strong id="kpiTotal">0</strong> total</div>
-        <div class="pill"><strong id="kpiFiltered">0</strong> showing</div>
+        <div class="pill"><strong id="kpiShowing">0</strong> showing</div>
         <div class="pill"><strong id="kpiDesigners">0</strong> designers</div>
       </div>
     </header>
@@ -158,344 +473,478 @@ def build_gallery(csv_path: Path, out_path: Path, title: str) -> None:
     <section class="controls">
       <div class="controls-grid">
         <div class="field">
-          <label for="q">Search</label>
-          <input id="q" type="search" placeholder="Designer, caption, look number…" autocomplete="off" />
+          <label for="search">Search</label>
+          <input id="search" type="search" placeholder="Search caption, designer, season...">
         </div>
 
         <div class="field">
-          <label for="season">Season</label>
-          <select id="season"></select>
+          <label for="seasonFilter">Season</label>
+          <select id="seasonFilter"></select>
         </div>
 
         <div class="field">
-          <label for="designer">Designer</label>
-          <select id="designer"></select>
+          <label for="designerFilter">Designer</label>
+          <select id="designerFilter"></select>
         </div>
 
         <div class="field">
-          <label for="sort">Sort</label>
-          <select id="sort">
+          <label for="sortBy">Sort</label>
+          <select id="sortBy">
             <option value="designer_look">Designer, Look</option>
-            <option value="look">Look (ascending)</option>
-            <option value="designer">Designer (A–Z)</option>
+            <option value="look_asc">Look (ascending)</option>
+            <option value="designer_asc">Designer (A–Z)</option>
             <option value="random">Random</option>
           </select>
         </div>
 
-        <button class="btn" id="reset">Reset</button>
-        <button class="btn primary" id="export">Export filtered CSV</button>
+        <button class="btn" id="resetBtn" type="button">Reset</button>
+        <button class="btn primary" id="exportBtn" type="button">Export filtered CSV</button>
+      </div>
 
-        <div class="toggles" style="grid-column: 1 / -1;">
-          <label class="toggle" title="Show only starred">
-            <input id="onlyStarred" type="checkbox" />
-            Only starred
-          </label>
-          <label class="toggle" title="Auto-load more while scrolling">
-            <input id="autoLoad" type="checkbox" checked />
-            Auto-load
-          </label>
-          <div class="hint">Keys: <span class="kbd">Esc</span> close • <span class="kbd">←</span>/<span class="kbd">→</span> navigate</div>
-        </div>
+      <div class="toggles">
+        <label class="toggle"><input id="onlyStarred" type="checkbox"> Only starred</label>
+        <label class="toggle"><input id="autoload" type="checkbox" checked> Auto-load</label>
+        <div class="toggle">Keys: Esc close • ←/→ navigate</div>
       </div>
     </section>
 
     <section class="layout">
+      <div id="emptyState" class="empty">No looks match the current filters.</div>
       <div id="grid" class="masonry"></div>
-      <div class="footerbar">
-        <div id="status" class="hint"></div>
-        <button class="btn" id="loadMore">Load more</button>
-        <div id="sentinel" style="position:absolute;width:1px;height:1px;opacity:0;"></div>
-      </div>
     </section>
+
+    <div class="footerbar">
+      <button class="btn" id="loadMoreBtn" type="button">Load more</button>
+    </div>
   </div>
 
-  <div class="modal" id="modal" aria-hidden="true">
-    <div class="modal-close" id="modalClose" title="Close (Esc)">✕</div>
-    <div class="modal-card" role="dialog" aria-modal="true">
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-card">
       <div class="modal-imgwrap">
-        <img id="modalImg" class="modal-img" alt="" />
+        <img id="modalImg" class="modal-img" alt="">
       </div>
       <div class="modal-side">
+        <button class="btn" id="closeModalBtn" type="button">✕</button>
+
         <div>
-          <div style="font-size:16px;font-weight:720" id="modalDesigner"></div>
-          <div style="font-size:12px;color:var(--muted)" id="modalMeta"></div>
+          <h2 id="modalTitle"></h2>
+          <div id="modalMeta" class="muted"></div>
         </div>
-        <div style="font-size:13px;line-height:1.35;color:rgba(232,234,240,.88)" id="modalCaption"></div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <a class="btn" id="openSource" target="_blank" rel="noopener">Open source</a>
-          <a class="btn" id="openImage" target="_blank" rel="noopener">Open image</a>
-          <button class="btn" id="toggleStar">Star</button>
+
+        <div id="modalCaption"></div>
+
+        <div class="modal-actions">
+          <a id="modalSource" class="btn" href="#" target="_blank" rel="noopener">Open source</a>
+          <a id="modalImage" class="btn" href="#" target="_blank" rel="noopener">Open image</a>
+          <button id="modalStar" class="btn" type="button">Star</button>
         </div>
-        <div style="display:flex;gap:10px;justify-content:space-between;align-items:center">
-          <button class="btn" id="prev">← Prev</button>
-          <div class="hint"><span id="modalIndex">0</span> / <span id="modalCount">0</span></div>
-          <button class="btn" id="next">Next →</button>
+
+        <div class="modal-nav">
+          <button class="btn" id="prevBtn" type="button">← Prev</button>
+          <div id="modalCount" class="count">0 / 0</div>
+          <button class="btn" id="nextBtn" type="button">Next →</button>
         </div>
       </div>
     </div>
   </div>
 
-<script>
-  const DATA = {json.dumps(data, ensure_ascii=False)};
+  <script>
+    const LOOKS = {json.dumps(data, ensure_ascii=False)};
+    const STAR_KEY = {js_string(star_key)};
+    const PAGE_TITLE = {js_string(title)};
 
-  const state = {{
-    q: "",
-    season: "All",
-    designer: "All",
-    sort: "designer_look",
-    onlyStarred: false,
-    autoLoad: true,
-    pageSize: 80,
-    page: 1,
-    filtered: [],
-    starred: new Set(JSON.parse(localStorage.getItem("{star_key}") || "[]")),
-    modalIndex: -1
-  }};
+    const PAGE_SIZE = 40;
 
-  const elQ = document.getElementById("q");
-  const elSeason = document.getElementById("season");
-  const elDesigner = document.getElementById("designer");
-  const elSort = document.getElementById("sort");
-  const elOnlyStarred = document.getElementById("onlyStarred");
-  const elAutoLoad = document.getElementById("autoLoad");
-  const elReset = document.getElementById("reset");
-  const elExport = document.getElementById("export");
-  const elGrid = document.getElementById("grid");
-  const elLoadMore = document.getElementById("loadMore");
-  const elStatus = document.getElementById("status");
-  const elKpiTotal = document.getElementById("kpiTotal");
-  const elKpiFiltered = document.getElementById("kpiFiltered");
-  const elKpiDesigners = document.getElementById("kpiDesigners");
-  const elSentinel = document.getElementById("sentinel");
+    let filtered = [];
+    let renderedCount = 0;
+    let modalIndex = -1;
 
-  const elModal = document.getElementById("modal");
-  const elModalClose = document.getElementById("modalClose");
-  const elModalImg = document.getElementById("modalImg");
-  const elModalDesigner = document.getElementById("modalDesigner");
-  const elModalMeta = document.getElementById("modalMeta");
-  const elModalCaption = document.getElementById("modalCaption");
-  const elOpenSource = document.getElementById("openSource");
-  const elOpenImage = document.getElementById("openImage");
-  const elToggleStar = document.getElementById("toggleStar");
-  const elPrev = document.getElementById("prev");
-  const elNext = document.getElementById("next");
-  const elModalIndex = document.getElementById("modalIndex");
-  const elModalCount = document.getElementById("modalCount");
+    const els = {{
+      search: document.getElementById("search"),
+      seasonFilter: document.getElementById("seasonFilter"),
+      designerFilter: document.getElementById("designerFilter"),
+      sortBy: document.getElementById("sortBy"),
+      resetBtn: document.getElementById("resetBtn"),
+      exportBtn: document.getElementById("exportBtn"),
+      onlyStarred: document.getElementById("onlyStarred"),
+      autoload: document.getElementById("autoload"),
+      grid: document.getElementById("grid"),
+      emptyState: document.getElementById("emptyState"),
+      loadMoreBtn: document.getElementById("loadMoreBtn"),
+      kpiTotal: document.getElementById("kpiTotal"),
+      kpiShowing: document.getElementById("kpiShowing"),
+      kpiDesigners: document.getElementById("kpiDesigners"),
+      modal: document.getElementById("modal"),
+      modalImg: document.getElementById("modalImg"),
+      modalTitle: document.getElementById("modalTitle"),
+      modalMeta: document.getElementById("modalMeta"),
+      modalCaption: document.getElementById("modalCaption"),
+      modalSource: document.getElementById("modalSource"),
+      modalImage: document.getElementById("modalImage"),
+      modalStar: document.getElementById("modalStar"),
+      modalCount: document.getElementById("modalCount"),
+      closeModalBtn: document.getElementById("closeModalBtn"),
+      prevBtn: document.getElementById("prevBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+    }};
 
-  const norm = (s) => (s || "").toString().trim();
-  const toKey = (item) => `${{norm(item.designer)}}__${{norm(item.season)}}__${{norm(item.look_number)}}__${{norm(item.image_url)}}`;
-  const uniq = (arr) => Array.from(new Set(arr)).filter(Boolean);
+    function text(v) {{
+      return (v ?? "").toString();
+    }}
 
-  function csvEscape(v) {{
-    const s = (v ?? "").toString();
-    if (/[",\\n]/.test(s)) return `"${{s.replace(/"/g,'""')}}"`;
-    return s;
-  }}
-  function toCSV(rows) {{
-    const headers = ["season","designer","look_number","image_url","caption","source_url"];
-    const lines = [headers.join(",")];
-    for (const r of rows) lines.push(headers.map(h => csvEscape(r[h])).join(","));
-    return lines.join("\\n");
-  }}
-  function download(filename, text) {{
-    const blob = new Blob([text], {{ type: "text/csv;charset=utf-8;" }});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-  }}
+    function normalize(v) {{
+      return text(v).trim().toLowerCase();
+    }}
 
-  function initSelects() {{
-    const seasons = ["All", ...uniq(DATA.map(d => norm(d.season))).sort((a,b)=>a.localeCompare(b))];
-    const designers = ["All", ...uniq(DATA.map(d => norm(d.designer))).sort((a,b)=>a.localeCompare(b))];
-    elSeason.innerHTML = seasons.map(s => `<option value="${{s}}">${{s}}</option>`).join("");
-    elDesigner.innerHTML = designers.map(s => `<option value="${{s}}">${{s}}</option>`).join("");
-  }}
+    function lookNumberForSort(item) {{
+      const n = Number(item.look_number);
+      return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
+    }}
 
-  function updateKpis() {{
-    elKpiTotal.textContent = DATA.length.toString();
-    elKpiFiltered.textContent = state.filtered.length.toString();
-    elKpiDesigners.textContent = uniq(DATA.map(d => norm(d.designer))).length.toString();
-  }}
+    function uniqSorted(values) {{
+      return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    }}
 
-  function applyFilters() {{
-    const q = state.q.toLowerCase();
-    let rows = DATA.filter(d => {{
-      const okSeason = state.season === "All" || norm(d.season) === state.season;
-      const okDesigner = state.designer === "All" || norm(d.designer) === state.designer;
-      const hay = `${{norm(d.designer)}} ${{norm(d.caption)}} ${{norm(d.look_number)}} ${{norm(d.season)}}`.toLowerCase();
-      const okQ = !q || hay.includes(q);
-      const okStar = !state.onlyStarred || state.starred.has(toKey(d));
-      return okSeason && okDesigner && okQ && okStar;
-    }});
-
-    if (state.sort === "designer_look") {{
-      rows.sort((a,b)=> {{
-        const da = norm(a.designer).localeCompare(norm(b.designer));
-        if (da !== 0) return da;
-        return (parseFloat(a.look_number)||0) - (parseFloat(b.look_number)||0);
-      }});
-    }} else if (state.sort === "look") {{
-      rows.sort((a,b)=> (parseFloat(a.look_number)||0) - (parseFloat(b.look_number)||0));
-    }} else if (state.sort === "designer") {{
-      rows.sort((a,b)=> norm(a.designer).localeCompare(norm(b.designer)));
-    }} else if (state.sort === "random") {{
-      for (let i = rows.length - 1; i > 0; i--) {{
+    function shuffle(arr) {{
+      const out = [...arr];
+      for (let i = out.length - 1; i > 0; i--) {{
         const j = Math.floor(Math.random() * (i + 1));
-        [rows[i], rows[j]] = [rows[j], rows[i]];
+        [out[i], out[j]] = [out[j], out[i]];
+      }}
+      return out;
+    }}
+
+    function csvEscape(v) {{
+      const s = text(v);
+      if (/[",\\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+      return s;
+    }}
+
+    function getStarred() {{
+      try {{
+        const raw = JSON.parse(localStorage.getItem(STAR_KEY) || "[]");
+        return Array.isArray(raw) ? raw : [];
+      }} catch (_) {{
+        return [];
       }}
     }}
 
-    state.filtered = rows;
-    state.page = 1;
-    render();
-    updateKpis();
-  }}
+    function saveStarred(items) {{
+      localStorage.setItem(STAR_KEY, JSON.stringify(items));
+    }}
 
-  function toggleStar(key, btn) {{
-    if (state.starred.has(key)) state.starred.delete(key);
-    else state.starred.add(key);
-    localStorage.setItem("{star_key}", JSON.stringify(Array.from(state.starred)));
-    if (btn) btn.dataset.starred = state.starred.has(key) ? "true" : "false";
-    if (state.onlyStarred) applyFilters();
-  }}
+    function isStarred(item) {{
+      return getStarred().some(x => x.id === item.id);
+    }}
 
-  function render() {{
-    const max = state.page * state.pageSize;
-    const slice = state.filtered.slice(0, max);
+    function toggleStar(item) {{
+      const starred = getStarred();
+      const exists = starred.some(x => x.id === item.id);
 
-    elGrid.innerHTML = "";
-    for (let idx = 0; idx < slice.length; idx++) {{
-      const item = slice[idx];
-      const key = toKey(item);
+      let updated;
+      if (exists) {{
+        updated = starred.filter(x => x.id !== item.id);
+      }} else {{
+        updated = [...starred, item];
+      }}
 
-      const card = document.createElement("div");
+      saveStarred(updated);
+      render(true);
+
+      if (modalIndex >= 0) {{
+        renderModal();
+      }}
+    }}
+
+    function populateFilters() {{
+      const seasons = uniqSorted(LOOKS.map(x => text(x.season)));
+      const designers = uniqSorted(LOOKS.map(x => text(x.designer)));
+
+      els.seasonFilter.innerHTML = '<option value="">All seasons</option>' +
+        seasons.map(v => `<option value="${{htm(v)}}">${{htm(v)}}</option>`).join("");
+
+      els.designerFilter.innerHTML = '<option value="">All designers</option>' +
+        designers.map(v => `<option value="${{htm(v)}}">${{htm(v)}}</option>`).join("");
+    }}
+
+    function htm(v) {{
+      return text(v)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }}
+
+    function applyFilters() {{
+      const q = normalize(els.search.value);
+      const season = normalize(els.seasonFilter.value);
+      const designer = normalize(els.designerFilter.value);
+      const onlyStarred = els.onlyStarred.checked;
+      const sortBy = els.sortBy.value;
+
+      let items = LOOKS.filter(item => {{
+        if (season && normalize(item.season) !== season) return false;
+        if (designer && normalize(item.designer) !== designer) return false;
+        if (onlyStarred && !isStarred(item)) return false;
+
+        if (q) {{
+          const haystack = [
+            item.season,
+            item.designer,
+            item.look_number,
+            item.caption,
+            item.source_url,
+          ].map(text).join(" ").toLowerCase();
+
+          if (!haystack.includes(q)) return false;
+        }}
+
+        return true;
+      }});
+
+      if (sortBy === "look_asc") {{
+        items.sort((a, b) => lookNumberForSort(a) - lookNumberForSort(b));
+      }} else if (sortBy === "designer_asc") {{
+        items.sort((a, b) =>
+          text(a.designer).localeCompare(text(b.designer)) ||
+          lookNumberForSort(a) - lookNumberForSort(b)
+        );
+      }} else if (sortBy === "random") {{
+        items = shuffle(items);
+      }} else {{
+        items.sort((a, b) =>
+          text(a.designer).localeCompare(text(b.designer)) ||
+          lookNumberForSort(a) - lookNumberForSort(b)
+        );
+      }}
+
+      return items;
+    }}
+
+    function updateKpis(showingCount, items) {{
+      els.kpiTotal.textContent = LOOKS.length;
+      els.kpiShowing.textContent = showingCount;
+      els.kpiDesigners.textContent = new Set(items.map(x => text(x.designer)).filter(Boolean)).size;
+    }}
+
+    function buildCard(item, absoluteIndex) {{
+      const card = document.createElement("article");
       card.className = "card";
+
+      const starred = isStarred(item);
+
       card.innerHTML = `
-        <span class="badge">${{item.season || ""}}</span>
+        <div class="badge">${{htm(text(item.season) || "—")}}</div>
         <div class="actions">
-          <button class="iconbtn" title="Star" data-key="${{key}}">★</button>
+          <button class="iconbtn starbtn" type="button" title="Star" aria-label="Star" data-starred="${{starred ? "true" : "false"}}">★</button>
         </div>
-        <img class="thumb" loading="lazy" src="${{item.image_url}}" alt="${{item.caption || "Look"}}" />
+        <img class="thumb" loading="lazy" src="${{htm(text(item.image_url))}}" alt="${{htm(text(item.caption) || text(item.designer) || "Look image")}}">
         <div class="meta">
           <div class="top">
-            <div class="designer" title="${{item.designer}}">${{item.designer}}</div>
-            <div class="look">#${{item.look_number}}</div>
+            <div class="designer">${{htm(text(item.designer) || "Unknown designer")}}</div>
+            <div class="look">Look ${{htm(text(item.look_number) || "—")}}</div>
           </div>
-          <div class="caption" title="${{item.caption || ""}}">${{item.caption || ""}}</div>
+          <div class="caption">${{htm(text(item.caption) || "No caption")}}</div>
         </div>
       `;
 
-      const starBtn = card.querySelector(".iconbtn");
-      starBtn.dataset.starred = state.starred.has(key) ? "true" : "false";
-      starBtn.addEventListener("click", (e)=>{{ e.stopPropagation(); toggleStar(key, starBtn); }});
+      card.addEventListener("click", () => openModal(absoluteIndex));
 
-      card.addEventListener("click", ()=> openModal(idx));
-      elGrid.appendChild(card);
+      const starBtn = card.querySelector(".starbtn");
+      starBtn.addEventListener("click", (e) => {{
+        e.stopPropagation();
+        toggleStar(item);
+      }});
+
+      return card;
     }}
 
-    const shown = slice.length;
-    elStatus.textContent = `Showing ${{shown}} of ${{state.filtered.length}}`;
-    elLoadMore.style.display = shown < state.filtered.length ? "inline-flex" : "none";
-  }}
+    function render(resetCount = false) {{
+      filtered = applyFilters();
 
-  function openModal(filteredIndex) {{
-    state.modalIndex = filteredIndex;
-    const item = state.filtered[filteredIndex];
-    if (!item) return;
-
-    const key = toKey(item);
-    elModalImg.src = item.image_url;
-    elModalImg.alt = item.caption || "Look";
-    elModalDesigner.textContent = item.designer || "";
-    elModalMeta.textContent = `${{item.season || ""}} • Look #${{item.look_number}}`;
-    elModalCaption.textContent = item.caption || "";
-    elOpenSource.href = item.source_url || item.image_url;
-    elOpenImage.href = item.image_url;
-    elToggleStar.textContent = state.starred.has(key) ? "Unstar" : "Star";
-    elModalIndex.textContent = (filteredIndex + 1).toString();
-    elModalCount.textContent = state.filtered.length.toString();
-    elModal.classList.add("open");
-  }}
-  function closeModal() {{ elModal.classList.remove("open"); }}
-  function modalStep(delta) {{
-    if (state.modalIndex < 0) return;
-    let next = state.modalIndex + delta;
-    if (next < 0) next = 0;
-    if (next >= state.filtered.length) next = state.filtered.length - 1;
-    openModal(next);
-  }}
-
-  elQ.addEventListener("input", (e)=>{{ state.q = e.target.value; applyFilters(); }});
-  elSeason.addEventListener("change", (e)=>{{ state.season = e.target.value; applyFilters(); }});
-  elDesigner.addEventListener("change", (e)=>{{ state.designer = e.target.value; applyFilters(); }});
-  elSort.addEventListener("change", (e)=>{{ state.sort = e.target.value; applyFilters(); }});
-  elOnlyStarred.addEventListener("change", (e)=>{{ state.onlyStarred = e.target.checked; applyFilters(); }});
-  elAutoLoad.addEventListener("change", (e)=>{{ state.autoLoad = e.target.checked; }});
-
-  elReset.addEventListener("click", ()=>{{
-    state.q=""; state.season="All"; state.designer="All"; state.sort="designer_look"; state.onlyStarred=false;
-    elQ.value=""; elSeason.value="All"; elDesigner.value="All"; elSort.value="designer_look"; elOnlyStarred.checked=false;
-    applyFilters();
-  }});
-
-  elExport.addEventListener("click", ()=>{{
-    download("{htmllib.escape(csv_path.stem)}__filtered.csv", toCSV(state.filtered));
-  }});
-
-  elLoadMore.addEventListener("click", ()=>{{ state.page += 1; render(); }});
-
-  const io = new IntersectionObserver((entries)=>{{
-    if (!state.autoLoad) return;
-    for (const e of entries) {{
-      if (e.isIntersecting && (state.page * state.pageSize) < state.filtered.length) {{
-        state.page += 1; render();
+      if (resetCount) {{
+        renderedCount = 0;
       }}
+      if (renderedCount === 0) {{
+        els.grid.innerHTML = "";
+      }}
+
+      if (!els.autoload.checked) {{
+        renderedCount = Math.min(PAGE_SIZE, filtered.length);
+      }} else {{
+        renderedCount = resetCount ? Math.min(PAGE_SIZE, filtered.length) : Math.max(renderedCount, Math.min(PAGE_SIZE, filtered.length));
+      }}
+
+      const toRender = filtered.slice(0, renderedCount);
+      els.grid.innerHTML = "";
+      toRender.forEach((item, idx) => {{
+        els.grid.appendChild(buildCard(item, idx));
+      }});
+
+      els.emptyState.style.display = filtered.length ? "none" : "block";
+      els.loadMoreBtn.style.display = renderedCount < filtered.length ? "inline-block" : "none";
+
+      updateKpis(toRender.length, filtered);
     }}
-  }}, {{ rootMargin: "600px" }});
-  io.observe(elSentinel);
 
-  elModalClose.addEventListener("click", closeModal);
-  elModal.addEventListener("click", (e)=>{{ if (e.target === elModal) closeModal(); }});
-  elPrev.addEventListener("click", ()=> modalStep(-1));
-  elNext.addEventListener("click", ()=> modalStep(1));
-  elToggleStar.addEventListener("click", ()=>{{
-    const item = state.filtered[state.modalIndex];
-    if (!item) return;
-    toggleStar(toKey(item), null);
-    elToggleStar.textContent = state.starred.has(toKey(item)) ? "Unstar" : "Star";
-    render();
-  }});
+    function loadMore() {{
+      renderedCount = Math.min(renderedCount + PAGE_SIZE, filtered.length);
+      render(false);
+    }}
 
-  window.addEventListener("keydown", (e)=>{{
-    if (e.key === "Escape") closeModal();
-    if (!elModal.classList.contains("open")) return;
-    if (e.key === "ArrowLeft") modalStep(-1);
-    if (e.key === "ArrowRight") modalStep(1);
-  }});
+    function openModal(index) {{
+      modalIndex = index;
+      renderModal();
+      els.modal.classList.add("open");
+      els.modal.setAttribute("aria-hidden", "false");
+    }}
 
-  initSelects();
-  applyFilters();
-</script>
+    function closeModal() {{
+      els.modal.classList.remove("open");
+      els.modal.setAttribute("aria-hidden", "true");
+      modalIndex = -1;
+    }}
+
+    function renderModal() {{
+      if (modalIndex < 0 || modalIndex >= filtered.length) return;
+
+      const item = filtered[modalIndex];
+      els.modalImg.src = text(item.image_url);
+      els.modalImg.alt = text(item.caption) || text(item.designer) || "Look image";
+      els.modalTitle.textContent = text(item.designer) || "Unknown designer";
+      els.modalMeta.textContent = `${{text(item.season) || "—"}} · Look ${{text(item.look_number) || "—"}}`;
+      els.modalCaption.textContent = text(item.caption) || "No caption";
+      els.modalSource.href = text(item.source_url) || "#";
+      els.modalImage.href = text(item.image_url) || "#";
+      els.modalCount.textContent = `${{modalIndex + 1}} / ${{filtered.length}}`;
+      els.modalStar.textContent = isStarred(item) ? "Unstar" : "Star";
+
+      els.modalStar.onclick = () => toggleStar(item);
+      els.prevBtn.disabled = modalIndex <= 0;
+      els.nextBtn.disabled = modalIndex >= filtered.length - 1;
+    }}
+
+    function exportFilteredCsv() {{
+      const rows = [
+        ["season", "designer", "look_number", "image_url", "caption", "source_url"],
+        ...filtered.map(item => [
+          text(item.season),
+          text(item.designer),
+          text(item.look_number),
+          text(item.image_url),
+          text(item.caption),
+          text(item.source_url),
+        ])
+      ];
+
+      const csv = rows.map(row => row.map(csvEscape).join(",")).join("\\n");
+      const blob = new Blob([csv], {{ type: "text/csv;charset=utf-8;" }});
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${{PAGE_TITLE.replace(/[^a-z0-9_-]+/gi, "_").toLowerCase()}}_filtered.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }}
+
+    function resetControls() {{
+      els.search.value = "";
+      els.seasonFilter.value = "";
+      els.designerFilter.value = "";
+      els.sortBy.value = "designer_look";
+      els.onlyStarred.checked = false;
+      renderedCount = 0;
+      render(true);
+    }}
+
+    els.search.addEventListener("input", () => {{
+      renderedCount = 0;
+      render(true);
+    }});
+    els.seasonFilter.addEventListener("change", () => {{
+      renderedCount = 0;
+      render(true);
+    }});
+    els.designerFilter.addEventListener("change", () => {{
+      renderedCount = 0;
+      render(true);
+    }});
+    els.sortBy.addEventListener("change", () => {{
+      renderedCount = 0;
+      render(true);
+    }});
+    els.onlyStarred.addEventListener("change", () => {{
+      renderedCount = 0;
+      render(true);
+    }});
+    els.resetBtn.addEventListener("click", resetControls);
+    els.exportBtn.addEventListener("click", exportFilteredCsv);
+    els.loadMoreBtn.addEventListener("click", loadMore);
+
+    els.closeModalBtn.addEventListener("click", closeModal);
+    els.modal.addEventListener("click", (e) => {{
+      if (e.target === els.modal) closeModal();
+    }});
+    els.prevBtn.addEventListener("click", () => {{
+      if (modalIndex > 0) {{
+        modalIndex -= 1;
+        renderModal();
+      }}
+    }});
+    els.nextBtn.addEventListener("click", () => {{
+      if (modalIndex < filtered.length - 1) {{
+        modalIndex += 1;
+        renderModal();
+      }}
+    }});
+
+    window.addEventListener("storage", (e) => {{
+      if (e.key === STAR_KEY) {{
+        render(true);
+      }}
+    }});
+
+    window.addEventListener("keydown", (e) => {{
+      if (e.key === "Escape" && els.modal.classList.contains("open")) {{
+        closeModal();
+      }} else if (e.key === "ArrowLeft" && els.modal.classList.contains("open") && modalIndex > 0) {{
+        modalIndex -= 1;
+        renderModal();
+      }} else if (e.key === "ArrowRight" && els.modal.classList.contains("open") && modalIndex < filtered.length - 1) {{
+        modalIndex += 1;
+        renderModal();
+      }}
+    }});
+
+    populateFilters();
+    renderedCount = Math.min(PAGE_SIZE, LOOKS.length);
+    render(true);
+  </script>
 </body>
 </html>
 """
+
     out_path.write_text(html_out, encoding="utf-8")
+
 
 def main():
     # Usage:
-    # python scripts/build_gallery.py data/seasons/<season>.csv site/seasons/<season>.html "Title"
+    # python scripts/build_gallery.py data/seasons/file.csv docs/seasons/file.html "Title"
     import sys
+
     if len(sys.argv) != 4:
-        print("Usage: python scripts/build_gallery.py <csv_path> <out_html_path> <title>")
+        print('Usage: python scripts/build_gallery.py <csv_path> <out_html_path> "Title"')
         raise SystemExit(2)
 
     csv_path = Path(sys.argv[1])
     out_path = Path(sys.argv[2])
     title = sys.argv[3]
+
     build_gallery(csv_path, out_path, title)
+
 
 if __name__ == "__main__":
     main()
-
