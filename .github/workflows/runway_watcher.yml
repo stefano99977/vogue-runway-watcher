@@ -37,7 +37,7 @@ on:
   schedule:
     # Daily at 07:00 UTC (~08:00 Madrid winter / ~09:00 summer)
     - cron: "0 7 * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
