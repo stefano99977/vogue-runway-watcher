@@ -123,6 +123,7 @@ jobs:
                   title
               ])
           subprocess.check_call([sys.executable, "scripts/build_index.py"])
+          subprocess.check_call([sys.executable, "scripts/build_starred_page.py"])
           PY
       # ─────────────────────────────────────────────
       # Commit changes
