@@ -1,42 +1,9 @@
-Skip to content
-stefano99977
-vogue-runway-watcher
-Repository navigation
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Commit 571f2a5
-stefano99977
-stefano99977
-authored
-15 minutes ago
-·
-·
-Verified
-Update runway_watcher.yml
-add fav main page
-main
-1 parent 
-b842648
- commit 
-571f2a5
-1 file changed
-+73
--156
-lines changed
-Search within code
- 
-‎.github/workflows/runway_watcher.yml‎
-Original file line number	Diff line number	Diff line change
-@@ -1,156 +1,73 @@
+
 name: Vogue Runway Watcher
 on:
   schedule:
     # Daily at 07:00 UTC (~08:00 Madrid winter / ~09:00 summer)
-    ##- cron: "0 7 * * *"
+    - cron: "0 7 * * *"
     workflow_dispatch:
 permissions:
   contents: write
