@@ -55,6 +55,8 @@ def main():
   <p class="lead">Auto-generated galleries (one per season detected on Vogue).</p>
 
   <div class="card">
+    <a class="starred-link" href="all.html">🖼️ Browse every show in one scroll</a>
+    &nbsp;
     <a class="starred-link" href="starred.html">⭐ Open my starred moodboard</a>
   </div>
 

@@ -14,12 +14,8 @@ def js_string(value: str) -> str:
     return json.dumps(value, ensure_ascii=False)
 
 
-def build_gallery(csv_path: Path, out_path: Path, title: str) -> None:
-    df = pd.read_csv(csv_path).fillna("")
-
-    page_slug = re.sub(r"[^a-zA-Z0-9_-]+", "_", out_path.stem)
-    page_url = f"seasons/{out_path.name}"
-
+def df_to_items(df, page_slug: str, page_url: str = "") -> list:
+    """Convert a looks DataFrame into the list of dicts the gallery template expects."""
     data = []
     for _, r in df.iterrows():
         look = str(r.get("look_number", "")).strip()
@@ -37,9 +33,19 @@ def build_gallery(csv_path: Path, out_path: Path, title: str) -> None:
             "source_url": str(r.get("source_url", "")).strip(),
         }
         data.append(item)
+    return data
 
+
+def render_gallery(
+    data: list,
+    out_path: Path,
+    title: str,
+    source_label: str,
+    star_key: str,
+) -> None:
+    """Render a gallery page from already-prepared items. Shared by single-season
+    pages and the combined all-shows page."""
     generated = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
-    star_key = TEMPLATE_STAR_KEY_PREFIX + page_slug
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -460,7 +466,7 @@ def build_gallery(csv_path: Path, out_path: Path, title: str) -> None:
       <div>
         <h1>{htmllib.escape(title)}</h1>
         <div class="subtitle">
-          Generated: {htmllib.escape(generated)} — source: <code>{htmllib.escape(csv_path.name)}</code>
+          Generated: {htmllib.escape(generated)} — source: <code>{htmllib.escape(source_label)}</code>
         </div>
       </div>
       <div class="kpis">
@@ -515,6 +521,7 @@ def build_gallery(csv_path: Path, out_path: Path, title: str) -> None:
 
     <div class="footerbar">
       <button class="btn" id="loadMoreBtn" type="button">Load more</button>
+      <div id="scrollSentinel" style="height:1px;width:100%;"></div>
     </div>
   </div>
 
@@ -919,6 +926,18 @@ def build_gallery(csv_path: Path, out_path: Path, title: str) -> None:
       }}
     }});
 
+    const scrollSentinel = document.getElementById("scrollSentinel");
+    if (scrollSentinel && "IntersectionObserver" in window) {{
+      const io = new IntersectionObserver((entries) => {{
+        for (const e of entries) {{
+          if (e.isIntersecting && els.autoload.checked && renderedCount < filtered.length) {{
+            loadMore();
+          }}
+        }}
+      }}, {{ rootMargin: "1500px 0px" }});
+      io.observe(scrollSentinel);
+    }}
+
     populateFilters();
     renderedCount = Math.min(PAGE_SIZE, LOOKS.length);
     render(true);
@@ -928,6 +947,20 @@ def build_gallery(csv_path: Path, out_path: Path, title: str) -> None:
 """
 
     out_path.write_text(html_out, encoding="utf-8")
+
+
+def build_gallery(csv_path: Path, out_path: Path, title: str) -> None:
+    df = pd.read_csv(csv_path).fillna("")
+    page_slug = re.sub(r"[^a-zA-Z0-9_-]+", "_", out_path.stem)
+    page_url = f"seasons/{out_path.name}"
+    data = df_to_items(df, page_slug, page_url)
+    render_gallery(
+        data,
+        out_path,
+        title,
+        source_label=csv_path.name,
+        star_key=TEMPLATE_STAR_KEY_PREFIX + page_slug,
+    )
 
 
 def main():
