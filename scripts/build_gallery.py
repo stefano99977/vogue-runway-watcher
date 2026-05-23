@@ -42,10 +42,23 @@ def render_gallery(
     title: str,
     source_label: str,
     star_key: str,
+    default_sort: str = "designer_look",
 ) -> None:
     """Render a gallery page from already-prepared items. Shared by single-season
     pages and the combined all-shows page."""
     generated = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+
+    sort_choices = [
+        ("designer_look", "Designer, Look"),
+        ("menswear_first", "Menswear first"),
+        ("look_asc", "Look (ascending)"),
+        ("designer_asc", "Designer (A–Z)"),
+        ("random", "Random"),
+    ]
+    sort_options_html = "".join(
+        f'<option value="{value}"{" selected" if value == default_sort else ""}>{label}</option>'
+        for value, label in sort_choices
+    )
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -249,18 +262,19 @@ def render_gallery(
     }}
 
     .masonry {{
-      column-count: 5;
-      column-gap: 12px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      align-items: start;
     }}
 
-    @media (max-width: 1300px) {{ .masonry {{ column-count: 4; }} }}
-    @media (max-width: 980px)  {{ .masonry {{ column-count: 3; }} }}
-    @media (max-width: 640px)  {{ .masonry {{ column-count: 2; }} }}
-    @media (max-width: 420px)  {{ .masonry {{ column-count: 1; }} }}
+    @media (max-width: 1300px) {{ .masonry {{ grid-template-columns: repeat(4, 1fr); }} }}
+    @media (max-width: 980px)  {{ .masonry {{ grid-template-columns: repeat(3, 1fr); }} }}
+    @media (max-width: 640px)  {{ .masonry {{ grid-template-columns: repeat(2, 1fr); }} }}
+    @media (max-width: 420px)  {{ .masonry {{ grid-template-columns: repeat(1, 1fr); }} }}
 
     .card {{
-      break-inside: avoid;
-      margin: 0 0 12px;
+      margin: 0;
       border-radius: 14px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.10);
@@ -274,7 +288,7 @@ def render_gallery(
       width: 100%;
       display: block;
       background: rgba(255,255,255,0.05);
-      min-height: 180px;
+      aspect-ratio: 2 / 3;
       object-fit: cover;
     }}
 
@@ -496,10 +510,7 @@ def render_gallery(
         <div class="field">
           <label for="sortBy">Sort</label>
           <select id="sortBy">
-            <option value="designer_look">Designer, Look</option>
-            <option value="look_asc">Look (ascending)</option>
-            <option value="designer_asc">Designer (A–Z)</option>
-            <option value="random">Random</option>
+            {sort_options_html}
           </select>
         </div>
 
@@ -559,6 +570,7 @@ def render_gallery(
     const LOOKS = {json.dumps(data, ensure_ascii=False)};
     const STAR_KEY = {js_string(star_key)};
     const PAGE_TITLE = {js_string(title)};
+    const DEFAULT_SORT = {js_string(default_sort)};
 
     const PAGE_SIZE = 40;
 
@@ -606,6 +618,10 @@ def render_gallery(
     function lookNumberForSort(item) {{
       const n = Number(item.look_number);
       return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
+    }}
+
+    function isMenswear(item) {{
+      return /menswear/.test(text(item.season).toLowerCase());
     }}
 
     function uniqSorted(values) {{
@@ -656,7 +672,20 @@ def render_gallery(
       }}
 
       saveStarred(updated);
-      render(true);
+
+      // Only rebuild the grid when the visible set actually changes (the
+      // "Only starred" filter is on). Otherwise update star buttons in place
+      // so the rest of the grid doesn't flash/reload.
+      if (els.onlyStarred.checked) {{
+        render(true);
+      }} else {{
+        const nowStarred = !exists;
+        els.grid.querySelectorAll(".starbtn").forEach(btn => {{
+          if (btn.dataset.id === item.id) {{
+            btn.dataset.starred = nowStarred ? "true" : "false";
+          }}
+        }});
+      }}
 
       if (modalIndex >= 0) {{
         renderModal();
@@ -711,6 +740,13 @@ def render_gallery(
 
       if (sortBy === "look_asc") {{
         items.sort((a, b) => lookNumberForSort(a) - lookNumberForSort(b));
+      }} else if (sortBy === "menswear_first") {{
+        items.sort((a, b) =>
+          (isMenswear(b) ? 1 : 0) - (isMenswear(a) ? 1 : 0) ||
+          text(a.season).localeCompare(text(b.season)) ||
+          text(a.designer).localeCompare(text(b.designer)) ||
+          lookNumberForSort(a) - lookNumberForSort(b)
+        );
       }} else if (sortBy === "designer_asc") {{
         items.sort((a, b) =>
           text(a.designer).localeCompare(text(b.designer)) ||
@@ -743,7 +779,7 @@ def render_gallery(
       card.innerHTML = `
         <div class="badge">${{htm(text(item.season) || "—")}}</div>
         <div class="actions">
-          <button class="iconbtn starbtn" type="button" title="Star" aria-label="Star" data-starred="${{starred ? "true" : "false"}}">★</button>
+          <button class="iconbtn starbtn" type="button" title="Star" aria-label="Star" data-id="${{htm(text(item.id))}}" data-starred="${{starred ? "true" : "false"}}">★</button>
         </div>
         <img class="thumb" loading="lazy" src="${{htm(text(item.image_url))}}" alt="${{htm(text(item.caption) || text(item.designer) || "Look image")}}">
         <div class="meta">
@@ -766,37 +802,36 @@ def render_gallery(
       return card;
     }}
 
-    function render(resetCount = false) {{
-      filtered = applyFilters();
+    function appendCards(target) {{
+      const frag = document.createDocumentFragment();
+      for (let i = renderedCount; i < target; i++) {{
+        frag.appendChild(buildCard(filtered[i], i));
+      }}
+      els.grid.appendChild(frag);
+      renderedCount = target;
+      els.loadMoreBtn.style.display = renderedCount < filtered.length ? "inline-block" : "none";
+      updateKpis(renderedCount, filtered);
+    }}
 
+    function render(resetCount = false) {{
+      // A full re-render (filters/sort/reset) rebuilds the grid; otherwise we
+      // only ever append, so already-loaded images stay in the DOM and never
+      // re-download or reorder as you scroll.
       if (resetCount) {{
+        filtered = applyFilters();
+        els.grid.innerHTML = "";
         renderedCount = 0;
       }}
-      if (renderedCount === 0) {{
-        els.grid.innerHTML = "";
-      }}
 
-      if (!els.autoload.checked) {{
-        renderedCount = Math.min(PAGE_SIZE, filtered.length);
-      }} else {{
-        renderedCount = resetCount ? Math.min(PAGE_SIZE, filtered.length) : Math.max(renderedCount, Math.min(PAGE_SIZE, filtered.length));
-      }}
-
-      const toRender = filtered.slice(0, renderedCount);
-      els.grid.innerHTML = "";
-      toRender.forEach((item, idx) => {{
-        els.grid.appendChild(buildCard(item, idx));
-      }});
+      const target = Math.min(Math.max(renderedCount, PAGE_SIZE), filtered.length);
+      appendCards(target);
 
       els.emptyState.style.display = filtered.length ? "none" : "block";
-      els.loadMoreBtn.style.display = renderedCount < filtered.length ? "inline-block" : "none";
-
-      updateKpis(toRender.length, filtered);
     }}
 
     function loadMore() {{
-      renderedCount = Math.min(renderedCount + PAGE_SIZE, filtered.length);
-      render(false);
+      const target = Math.min(renderedCount + PAGE_SIZE, filtered.length);
+      appendCards(target);
     }}
 
     function openModal(index) {{
@@ -861,7 +896,7 @@ def render_gallery(
       els.search.value = "";
       els.seasonFilter.value = "";
       els.designerFilter.value = "";
-      els.sortBy.value = "designer_look";
+      els.sortBy.value = DEFAULT_SORT;
       els.onlyStarred.checked = false;
       renderedCount = 0;
       render(true);
