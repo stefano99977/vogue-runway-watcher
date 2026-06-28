@@ -113,7 +113,10 @@ jobs:
           git config user.email "runway-bot@users.noreply.github.com"
           git fetch origin main
           git checkout main
-          git reset --hard origin/main
+          # NOTE: do NOT `git reset --hard origin/main` here — that wipes
+          # every change the build step just made to tracked files
+          # (docs/all.html, docs/index.html, data/state_shows.json, etc.)
+          # and only newly-created untracked files would survive.
           git add -A
           git commit -m "Update Vogue watcher state/output" || exit 0
           git pull --rebase origin main
