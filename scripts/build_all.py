@@ -54,6 +54,7 @@ def main() -> None:
         title="Vogue Runway — All Shows",
         source_label=source_label,
         star_key=TEMPLATE_STAR_KEY_PREFIX + "all",
+        default_sort="menswear_first",
     )
 
     print(
