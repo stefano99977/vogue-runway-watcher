@@ -2,6 +2,7 @@
   "known_show_slugs": [
     "resort-2027/christopher-esber",
     "resort-2027/sacai",
+    "resort-2027/teurn",
     "resort-2027/tove",
     "spring-2027-menswear/3paradis",
     "spring-2027-menswear/acne-studios",
@@ -28,6 +29,7 @@
     "spring-2027-menswear/dries-van-noten",
     "spring-2027-menswear/dunhill",
     "spring-2027-menswear/egonlab",
+    "spring-2027-menswear/engineered-garments",
     "spring-2027-menswear/ernest-w-baker",
     "spring-2027-menswear/etro",
     "spring-2027-menswear/etudes",
@@ -53,6 +55,7 @@
     "spring-2027-menswear/missoni",
     "spring-2027-menswear/msgm",
     "spring-2027-menswear/nahmias",
+    "spring-2027-menswear/nehera",
     "spring-2027-menswear/officine-generale",
     "spring-2027-menswear/our-legacy",
     "spring-2027-menswear/paul-smith",
@@ -87,6 +90,8 @@
     "spring-2027-menswear/yohji-yamamoto",
     "spring-2027-menswear/zegna",
     "spring-2027-ready-to-wear/erl",
+    "spring-2027-ready-to-wear/jacquemus",
+    "spring-2027-ready-to-wear/marc-jacobs",
     "spring-2027-ready-to-wear/studio-nicholson"
   ]
 }
