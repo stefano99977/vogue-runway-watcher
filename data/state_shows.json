@@ -1,7 +1,6 @@
 {
   "known_show_slugs": [
     "copenhagen-spring-2027/aiayu",
-    "copenhagen-spring-2027/anne-sofie-madsen",
     "copenhagen-spring-2027/baum-und-pferdgarten",
     "copenhagen-spring-2027/by-malene-birger",
     "copenhagen-spring-2027/caro-editions",
@@ -15,9 +14,12 @@
     "copenhagen-spring-2027/nicklas-skovgaard",
     "copenhagen-spring-2027/paolina-russo",
     "copenhagen-spring-2027/skall-studio",
+    "copenhagen-spring-2027/stel",
     "copenhagen-spring-2027/stine-goya",
     "copenhagen-spring-2027/studio-constance",
     "copenhagen-spring-2027/the-garment",
+    "copenhagen-spring-2027/the-royal-danish-academy",
+    "copenhagen-spring-2027/the-swedish-school-of-textiles",
     "fall-2026-couture/alexis-mabille",
     "fall-2026-couture/antonio-grimaldi",
     "fall-2026-couture/ardazaei",
@@ -45,12 +47,10 @@
     "fall-2026-couture/standing-ground",
     "fall-2026-couture/viktor-rolf",
     "fall-2026-couture/zuhair-murad",
-    "fall-2026-ready-to-wear/16arlington",
     "fall-2026-ready-to-wear/paolo-carzana",
-    "resort-2027/mary-katrantzou",
-    "resort-2027/self-portrait",
-    "resort-2027/sportmax",
+    "tokyo-spring-2027/akikoaoki",
     "tokyo-spring-2027/chika-kisada",
+    "tokyo-spring-2027/harunobumurata",
     "tokyo-spring-2027/masu"
   ]
 }
