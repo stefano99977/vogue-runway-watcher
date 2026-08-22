@@ -1,11 +1,8 @@
 {
   "known_show_slugs": [
-    "copenhagen-spring-2027/baum-und-pferdgarten",
     "copenhagen-spring-2027/caro-editions",
     "copenhagen-spring-2027/collina-strada",
-    "copenhagen-spring-2027/henrik-vibskov",
     "copenhagen-spring-2027/iamisigo",
-    "copenhagen-spring-2027/mfpen",
     "copenhagen-spring-2027/nicklas-skovgaard",
     "copenhagen-spring-2027/stel",
     "copenhagen-spring-2027/the-royal-danish-academy",
@@ -38,9 +35,10 @@
     "fall-2026-couture/viktor-rolf",
     "fall-2026-couture/zuhair-murad",
     "fall-2026-ready-to-wear/alexander-wang",
+    "fall-2026-ready-to-wear/simon-miller",
+    "spring-2026-ready-to-wear/romance-was-born",
     "spring-2027-ready-to-wear/bode",
     "tokyo-spring-2027/akikoaoki",
-    "tokyo-spring-2027/chika-kisada",
     "tokyo-spring-2027/harunobumurata",
     "tokyo-spring-2027/masu"
   ]
